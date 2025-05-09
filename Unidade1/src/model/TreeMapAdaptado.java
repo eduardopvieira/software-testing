@@ -12,7 +12,7 @@ public class TreeMapAdaptado {
     public TreeMapAdaptado() {}
 
     public void addDuende(Duende duende) {
-        Double chave = duende.getPosition();
+        double chave = duende.getPosition();
 
         while (treeMapPrincipal.containsKey(chave)) {
             chave += 0.1;
@@ -33,7 +33,7 @@ public class TreeMapAdaptado {
 
     public Duende findNearestDuende(Duende atual) {
 
-        Double chaveAtual = atual.getPosition();
+        double chaveAtual = atual.getPosition();
 
         //* pega o nó anterior
         Map.Entry<Double, Duende> anterior = treeMapPrincipal.lowerEntry(chaveAtual);
@@ -70,8 +70,5 @@ public class TreeMapAdaptado {
 
         return A.getMoney() > B.getMoney() ? A : B;
     }
-
-
-
 
 }

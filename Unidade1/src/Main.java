@@ -1,4 +1,6 @@
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import model.Duende;
@@ -21,9 +23,10 @@ public class Main {
             tma.addDuende(duende);
         }
 
+        List<Duende> iterarDuendes = new ArrayList<>(tma.treeMapPrincipal.values());
 
         for (int i = 0; i < NUM_ITERACOES; i++) {
-            for (Duende duende : tma.treeMapPrincipal.values()) {
+            for (Duende duende : iterarDuendes) {
                 double chave = duende.getPosition();
                 tma.treeMapPrincipal.remove(chave);
                 duende.move();
@@ -33,18 +36,9 @@ public class Main {
             System.out.println("Iteração " + (i + 1) + " concluída.");
         }
 
-
-
-        // for (int i = 0; i < NUM_ITERACOES; i++) {
-        //     for (Duende duende : tma.treeMapPrincipal.values()) {
-        //         double chave = duende.getPosition();
-        //         tma.treeMapPrincipal.remove(chave);
-        //         duende.move();
-        //         tma.addDuende(duende);
-        //     }
-        //     System.out.println("Iteração " + (i + 1) + " concluída.");
-        // }
-
+        for (Duende d : tma.treeMapPrincipal.values()) {
+            System.out.println("Duende " + d.getId() + ": " + d.getMoney() + " Dinheiros");
+        }
 
         
         scanner.close();

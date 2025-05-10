@@ -9,11 +9,13 @@ import model.TreeMapAdaptado;
 public class Main {
     public static void main(String[] args) {
 
-        final int NUM_ITERACOES = 10;
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o número de duendes:");
         int numDuendes = scanner.nextInt();
+
+        System.out.println("Digite o número de iterações: ");
+        int numIteracoes = scanner.nextInt();
         
 
         TreeMapAdaptado tma = new TreeMapAdaptado();
@@ -25,7 +27,7 @@ public class Main {
 
         List<Duende> iterarDuendes = new ArrayList<>(tma.treeMapPrincipal.values());
 
-        for (int i = 0; i < NUM_ITERACOES; i++) {
+        for (int i = 0; i < numIteracoes; i++) {
             for (Duende duende : iterarDuendes) {
                 double chave = duende.getPosition();
                 tma.treeMapPrincipal.remove(chave);
@@ -36,9 +38,10 @@ public class Main {
             System.out.println("Iteração " + (i + 1) + " concluída.");
         }
 
-        for (Duende d : tma.treeMapPrincipal.values()) {
+        for (Duende d : iterarDuendes) {
             System.out.println("Duende " + d.getId() + ": " + d.getMoney() + " Dinheiros");
         }
+
 
         
         scanner.close();

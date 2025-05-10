@@ -16,9 +16,9 @@ public class TreeMapAdaptado {
 
         while (treeMapPrincipal.containsKey(chave)) {
             chave += 0.1;
+            System.out.println("Conflito de duendes. Duende " + duende.getId() + " foi movido para " + chave);
         }
         duende.setPosition(chave);
-        System.out.println("Conflito de duendes. Duende " + duende.getId() + " foi movido para " + chave);
         treeMapPrincipal.put(duende.getPosition(), duende);
     }
 

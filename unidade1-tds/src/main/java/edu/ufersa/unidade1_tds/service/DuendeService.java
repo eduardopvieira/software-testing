@@ -10,10 +10,12 @@ import java.util.List;
 @Service
 public class DuendeService {
     private TreeMapAdaptado tma = new TreeMapAdaptado();
-    private int numIteracoes;
+    private int iteracaoAtual = 0;;
+    private boolean simulacaoIniciada = false;
 
     public void iniciarSimulacao(int numDuendes) {
         tma.clear();
+        simulacaoIniciada = true;
 
         for (int i = 0; i < numDuendes; i++) {
             Duende duende = new Duende(i);
@@ -34,17 +36,26 @@ public class DuendeService {
                 duende.steal(vitima);
             }
         }
+
+        iteracaoAtual++;
     }
 
     public List<Duende> getDuendes() {
         return new ArrayList<>(tma.getTreeMapPrincipal().values());
     }
 
-    public int getNumIteracoes() {
-        return numIteracoes;
+    public int getIteracaoAtual() {
+        return iteracaoAtual;
     }
 
-    public void setNumIteracoes(int numIteracoes) {
-        this.numIteracoes = numIteracoes;
+     public void resetarSimulacao() {
+        tma.clear();
+        iteracaoAtual = 0;
+        simulacaoIniciada = false;
     }
+
+    public boolean isSimulacaoIniciada() {
+        return simulacaoIniciada;
+    }
+
 }

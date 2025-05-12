@@ -1,0 +1,139 @@
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    padding: 20px;
+}
+
+.duende-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.duende-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.duende-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.duende-header h5 {
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.duende-money {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #28a745;
+    background-color: #f0fff4;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.btn-iteration {
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background-color: #1a8754;
+    border-color: #1a8754;
+    color: white;
+}
+
+.btn-iteration:hover {
+    background-color: #136f43;
+    border-color: #136f43;
+}
+
+.btn-iteration:disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    font-weight: 600;
+    padding: 12px 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.form-control {
+    border-radius: 6px;
+    padding: 10px 15px;
+}
+
+.btn {
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #3a5ec0;
+    border-color: #3a5ec0;
+}
+
+.btn-success {
+    background-color: #1cc88a;
+    border-color: #1cc88a;
+}
+
+.btn-success:hover {
+    background-color: #17a673;
+    border-color: #17a673;
+}
+
+/* Títulos e textos */
+h1 {
+    color: #2e3a4d;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Layout responsivo */
+@media (max-width: 768px) {
+    .duende-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .duende-money {
+        margin-top: 5px;
+    }
+}

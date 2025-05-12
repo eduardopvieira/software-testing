@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Duendes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Simulação de Duendes</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Configuração
+        </div>
+        <div class="card-body">
+            <form th:action="@{/iniciar}" method="post">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="numDuendes" class="form-label">Número de Duendes</label>
+                        <input type="number" class="form-control" id="numDuendes"
+                               name="numDuendes" min="1" required th:value="${numIteracoes ?: 5}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="numIteracoes" class="form-label">Número de Iterações</label>
+                        <input type="number" class="form-control" id="numIteracoes"
+                               name="numIteracoes" min="1" required th:value="${numIteracoes ?: 5}">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Iniciar Simulação</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Ações
+        </div>
+        <div class="card-body">
+            <form th:action="@{/iterar}" method="post">
+                <button type="submit" class="btn-iteration">Executar Iteração</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div th:each="duende : ${duendes}" class="col-md-4">
+            <div class="duende-card">
+                <div class="duende-header">
+                    <div>
+                        <h5 class="duende-title">Duende #<span th:text="${duende.id}"></span></h5>
+                        <span class="duende-position">
+                            Posição: <span th:text="${#numbers.formatDecimal(duende.position, 1, 2)}"></span>
+                        </span>
+                    </div>
+                    <span class="duende-money" th:text="${'$' + #numbers.formatDecimal(duende.money, 1, 'COMMA', 2, 'POINT')}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

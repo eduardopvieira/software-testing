@@ -118,7 +118,6 @@ body {
     border-color: #17a673;
 }
 
-/* Títulos e textos */
 h1 {
     color: #2e3a4d;
     font-weight: 700;
@@ -126,14 +125,22 @@ h1 {
     text-align: center;
 }
 
-/* Layout responsivo */
-@media (max-width: 768px) {
-    .duende-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #000000;
+}
 
-    .duende-money {
-        margin-top: 5px;
-    }
+.btn-danger:hover {
+    background-color: #ff0019;
+    border-color: #000000;
+}
+
+.btn-danger:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Layout dos botões */
+.d-flex.justify-content-between {
+    gap: 10px;
 }

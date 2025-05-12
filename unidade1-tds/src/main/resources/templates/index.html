@@ -16,36 +16,41 @@
             Configuração
         </div>
         <div class="card-body">
-            <form th:action="@{/iniciar}" method="post">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="numDuendes" class="form-label">Número de Duendes</label>
-                        <input type="number" class="form-control" id="numDuendes"
-                               name="numDuendes" min="1" required th:value="${numIteracoes ?: 5}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="numIteracoes" class="form-label">Número de Iterações</label>
-                        <input type="number" class="form-control" id="numIteracoes"
-                               name="numIteracoes" min="1" required th:value="${numIteracoes ?: 5}">
-                    </div>
+            <form th:action="@{/iniciar}" method="post" id="configForm">
+                <div class="mb-3">
+                    <label for="numDuendes" class="form-label">Número de Duendes</label>
+                    <input type="number" class="form-control" id="numDuendes"
+                           name="numDuendes" min="1" required th:value="${simulacaoIniciada} ? '' : 5">
                 </div>
-                <button type="submit" class="btn btn-primary">Iniciar Simulação</button>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary" th:disabled="${simulacaoIniciada}">
+                        Iniciar Simulação
+                    </button>
+                    <button type="button" class="btn btn-danger" id="resetBtn"
+                            th:disabled="${!simulacaoIniciada}" onclick="document.getElementById('resetForm').submit()">
+                        Resetar
+                    </button>
+                </div>
             </form>
+            <form id="resetForm" th:action="@{/resetar}" method="post" style="display: none;"></form>
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            Ações
+    <div class="card mb-4" th:if="${simulacaoIniciada}">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Ações</span>
+            <span class="badge bg-secondary">Iteração: <span th:text="${iteracaoAtual}">0</span></span>
         </div>
         <div class="card-body">
             <form th:action="@{/iterar}" method="post">
-                <button type="submit" class="btn-iteration">Executar Iteração</button>
+                <button type="submit" class="btn-iteration">
+                    Executar Iteração
+                </button>
             </form>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" th:if="${simulacaoIniciada}">
         <div th:each="duende : ${duendes}" class="col-md-4">
             <div class="duende-card">
                 <div class="duende-header">

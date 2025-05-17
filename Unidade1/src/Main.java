@@ -13,6 +13,8 @@ public class Main {
     private static JFrame frame;
     private static JPanel inputPanel;
     private static JTextField inputField;
+    private static JTextField minField;
+    private static JTextField maxField;
 
     public static void main(String[] args) {
         criarJanelaInput();
@@ -21,33 +23,65 @@ public class Main {
     private static void criarJanelaInput() {
         frame = new JFrame("Configuração da Simulação");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 200);
+        frame.setSize(450, 300); // Aumentei o tamanho para acomodar os novos campos
         frame.setLayout(new BorderLayout());
 
+        // Painel principal com bordas e espaçamento
         inputPanel = new JPanel();
-        inputPanel.setLayout(new GridLayout(3, 1, 10, 10));
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel label = new JLabel("Digite o número de duendes:", SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.BOLD, 16));
-
+        // Configuração de fonte para reutilização
+        Font fontLabel = new Font("Arial", Font.BOLD, 14);
+        Font fontField = new Font("Arial", Font.PLAIN, 14);
+        
+        // Campo para número de duendes
+        JPanel duendesPanel = new JPanel(new BorderLayout(5, 5));
+        JLabel duendesLabel = new JLabel("Digite o número de duendes:", SwingConstants.LEFT);
+        duendesLabel.setFont(fontLabel);
         inputField = new JTextField();
-        inputField.setFont(new Font("Arial", Font.PLAIN, 14));
-        inputField.setHorizontalAlignment(JTextField.CENTER);
-
+        inputField.setFont(fontField);
+        duendesPanel.add(duendesLabel, BorderLayout.NORTH);
+        duendesPanel.add(inputField, BorderLayout.CENTER);
+        
+        // Painel para os valores do horizonte (máximo e mínimo)
+        JPanel horizontePanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        horizontePanel.setBorder(BorderFactory.createTitledBorder("Configuração do Horizonte"));
+        
+        // Campo para valor mínimo do horizonte
+        JPanel minPanel = new JPanel(new BorderLayout(5, 5));
+        JLabel minLabel = new JLabel("Valor Mínimo:", SwingConstants.LEFT);
+        minLabel.setFont(fontLabel);
+        minField = new JTextField();
+        minField.setFont(fontField);
+        minPanel.add(minLabel, BorderLayout.NORTH);
+        minPanel.add(minField, BorderLayout.CENTER);
+        
+        // Campo para valor máximo do horizonte
+        JPanel maxPanel = new JPanel(new BorderLayout(5, 5));
+        JLabel maxLabel = new JLabel("Valor Máximo:", SwingConstants.LEFT);
+        maxLabel.setFont(fontLabel);
+        maxField = new JTextField();
+        maxField.setFont(fontField);
+        maxPanel.add(maxLabel, BorderLayout.NORTH);
+        maxPanel.add(maxField, BorderLayout.CENTER);
+        
+        horizontePanel.add(minPanel);
+        horizontePanel.add(maxPanel);
+        
+        // Botão de iniciar simulação
         JButton startButton = new JButton("Iniciar Simulação");
         startButton.setFont(new Font("Arial", Font.BOLD, 14));
-        startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                iniciarSimulacao();
-            }
-        });
-
-        inputPanel.add(label);
-        inputPanel.add(inputField);
+        startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startButton.addActionListener(e -> iniciarSimulacao());
+        
+        // Adiciona os componentes ao painel principal com espaçamento
+        inputPanel.add(duendesPanel);
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Espaço entre componentes
+        inputPanel.add(horizontePanel);
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Mais espaço antes do botão
         inputPanel.add(startButton);
-
+        
         frame.add(inputPanel, BorderLayout.CENTER);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -56,6 +90,8 @@ public class Main {
     private static void iniciarSimulacao() {
         try {
             int numDuendes = Integer.parseInt(inputField.getText());
+            int minHorizon = Integer.parseInt(minField.getText());
+            int maxHorizon = Integer.parseInt(maxField.getText());
 
             if (numDuendes < 1 || numDuendes > 20) {
                 JOptionPane.showMessageDialog(frame,
@@ -70,7 +106,7 @@ public class Main {
 
             List<Duende> duendes = criarDuendes(numDuendes);
             TreeMapAdaptado tma = inicializarTreeMap(duendes);
-            SimulationPanel panel = criarEExibirJanela(duendes);
+            SimulationPanel panel = criarEExibirJanela(duendes, minHorizon, maxHorizon);
             executarLogicaSimulacao(duendes, tma, panel);
 
         } catch (NumberFormatException ex) {
@@ -95,8 +131,8 @@ public class Main {
         return tma;
     }
 
-    private static SimulationPanel criarEExibirJanela(List<Duende> duendes) {
-        SimulationPanel panel = new SimulationPanel(duendes);
+    private static SimulationPanel criarEExibirJanela(List<Duende> duendes, int minHorizon, int maxHorizon) {
+        SimulationPanel panel = new SimulationPanel(duendes, minHorizon, maxHorizon);
         JFrame simulationFrame = new JFrame("Simulação de Duendes");
         simulationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         simulationFrame.add(panel);

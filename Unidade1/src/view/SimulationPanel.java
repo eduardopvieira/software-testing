@@ -14,14 +14,21 @@ public class SimulationPanel extends JPanel {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 400;
     private static final int GROUND_Y = 350;
-    private static final int SCALE = (WIDTH - 100) / 30;
     
     private final List<Duende> duendes;
     private final HashMap<Integer, BufferedImage> sprites;
+
+    private int leftHorizonLimit;
+    private int rightHorizonLimit;
+    private static int SCALE;
     
-    public SimulationPanel(List<Duende> duendes) {
+    public SimulationPanel(List<Duende> duendes, int leftHorizonLimit, int rightHorizonLimit) {
         this.duendes = duendes;
         this.sprites = new HashMap<>();
+        this.leftHorizonLimit = leftHorizonLimit;
+        this.rightHorizonLimit = rightHorizonLimit;
+        SimulationPanel.SCALE = (WIDTH - 100) / 50;
+
         loadSprites(); // Ou generateSprites() para versão programática
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(173, 216, 230));
@@ -172,9 +179,9 @@ private BufferedImage colorizeSprite(BufferedImage original, int id) {
         
         // Linha de chegada
         g2d.setColor(Color.RED);
-        g2d.fillRect(29 * SCALE + 50, GROUND_Y - 150, SCALE, 150);
+        g2d.fillRect((rightHorizonLimit - 1) * SCALE + 50, GROUND_Y - 150, SCALE, 150);
         g2d.setColor(Color.WHITE);
-        g2d.drawString("CHEGADA", 29 * SCALE + 50, GROUND_Y - 160);
+        g2d.drawString("CHEGADA", (rightHorizonLimit - 1) * SCALE + 50, GROUND_Y - 160);
     }
     
     private void drawGroundScale(Graphics2D g2d) {
@@ -182,10 +189,10 @@ private BufferedImage colorizeSprite(BufferedImage original, int id) {
         g2d.setFont(new Font("Arial", Font.PLAIN, 10));
         
         // Desenha a linha de escala
-        g2d.drawLine(50, GROUND_Y + 20, WIDTH - 50, GROUND_Y + 20);
+        g2d.drawLine(rightHorizonLimit, GROUND_Y + 20, WIDTH - rightHorizonLimit, GROUND_Y + 20);
         
         // Desenha os marcadores e números
-        for (int i = 0; i <= 30; i++) {
+        for (int i = 0; i <= rightHorizonLimit; i++) {
             int x = 50 + (i * SCALE);
             
             // Marcador principal a cada 5 unidades
@@ -207,10 +214,10 @@ private BufferedImage colorizeSprite(BufferedImage original, int id) {
         g2d.drawString("Simulação de Duendes - Movendo e Roubando Ouro", 20, 20);
     }
     
-    public static void showSimulation(List<Duende> duendes) {
+    public static void showSimulation(List<Duende> duendes, int leftHorizonLimit, int rightHorizonLimit) {
         JFrame frame = new JFrame("Simulação de Duendes");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SimulationPanel(duendes));
+        frame.add(new SimulationPanel(duendes, leftHorizonLimit, rightHorizonLimit));
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

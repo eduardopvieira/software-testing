@@ -1,12 +1,13 @@
 package model;
 
 public class SimulacaoParams {
-    double minHorizon, maxHorizon, pontoParada;
+    double minHorizon, maxHorizon;
+    Long maxCoins;
 
-    public SimulacaoParams(double minHorizon, double maxHorizon, double pontoParada) {
+    public SimulacaoParams(double minHorizon, double maxHorizon, Long maxCoins) {
         this.minHorizon = minHorizon;
         this.maxHorizon = maxHorizon;
-        this.pontoParada = pontoParada;
+        this.maxCoins = maxCoins;
     }
     public double getMinHorizon() {
         return minHorizon;
@@ -20,11 +21,11 @@ public class SimulacaoParams {
     public void setMaxHorizon(double maxHorizon) {
         this.maxHorizon = maxHorizon;
     }
-    public double getPontoParada() {
-        return pontoParada;
+    public Long getMaxCoinsLong() {
+        return this.maxCoins;
     }
-    public void setPontoParada(double pontoParada) {
-        this.pontoParada = pontoParada;
+    public void setMaxCoinsLong(Long maxCoinsLong) {
+        this.maxCoins = maxCoinsLong;
     }
 
 }

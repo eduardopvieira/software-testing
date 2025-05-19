@@ -42,9 +42,9 @@ public class TreeMapAdaptado {
     }
 
     private Duende verMaisRico(Duende A, Duende B) {
-        if (Objects.equals(A.getOuro(), B.getOuro())) {
+        if (Objects.equals(A.getCoins(), B.getCoins())) {
             return new Random().nextBoolean() ? A : B;
         }
-        return A.getOuro() > B.getOuro() ? A : B;
+        return A.getCoins() > B.getCoins() ? A : B;
     }
 }

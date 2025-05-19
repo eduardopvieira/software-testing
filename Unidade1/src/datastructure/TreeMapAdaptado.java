@@ -1,9 +1,11 @@
-package model;
+package datastructure;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
+
+import model.Duende;
 
 public class TreeMapAdaptado {
     public TreeMap<Double, Duende> treeMapPrincipal = new TreeMap<>();
@@ -40,9 +42,9 @@ public class TreeMapAdaptado {
     }
 
     private Duende verMaisRico(Duende A, Duende B) {
-        if (Objects.equals(A.getMoney(), B.getMoney())) {
+        if (Objects.equals(A.getOuro(), B.getOuro())) {
             return new Random().nextBoolean() ? A : B;
         }
-        return A.getMoney() > B.getMoney() ? A : B;
+        return A.getOuro() > B.getOuro() ? A : B;
     }
 }

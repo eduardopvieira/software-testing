@@ -3,14 +3,13 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import javax.imageio.ImageIO;
 import model.Duende;
 
-public class SimulationPanel extends JPanel {
+public class SimulationView extends JPanel {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 400;
     private static final int GROUND_Y = 350;
@@ -18,16 +17,14 @@ public class SimulationPanel extends JPanel {
     private final List<Duende> duendes;
     private final HashMap<Integer, BufferedImage> sprites;
 
-    private int leftHorizonLimit;
     private int rightHorizonLimit;
     private static int SCALE;
     
-    public SimulationPanel(List<Duende> duendes, int leftHorizonLimit, int rightHorizonLimit) {
+    public SimulationView(List<Duende> duendes, int rightHorizonLimit) {
         this.duendes = duendes;
         this.sprites = new HashMap<>();
-        this.leftHorizonLimit = leftHorizonLimit;
         this.rightHorizonLimit = rightHorizonLimit;
-        SimulationPanel.SCALE = (WIDTH - 100) / 50;
+        SimulationView.SCALE = (WIDTH - 100) / 10;
 
         loadSprites(); // Ou generateSprites() para versão programática
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -144,7 +141,7 @@ private BufferedImage colorizeSprite(BufferedImage original, int id) {
         g2d.setColor(Color.BLACK);
         g2d.drawString("#" + duende.getId(), x + 15, y + 65);
         g2d.setColor(Color.YELLOW);
-        g2d.drawString("$" + (duende.getMoney()/1000) + "k", x + 10, y + 80);
+        g2d.drawString("$" + (duende.getOuro()/1000) + "k", x + 10, y + 80);
     }
     
     private void drawDuendeFallback(Graphics2D g2d, Duende duende) {
@@ -187,23 +184,20 @@ private BufferedImage colorizeSprite(BufferedImage original, int id) {
     private void drawGroundScale(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
         g2d.setFont(new Font("Arial", Font.PLAIN, 10));
+
+        int lineOffset = 50;
         
         // Desenha a linha de escala
-        g2d.drawLine(rightHorizonLimit, GROUND_Y + 20, WIDTH - rightHorizonLimit, GROUND_Y + 20);
+        g2d.drawLine(lineOffset, GROUND_Y + 20, WIDTH-lineOffset, GROUND_Y + 20);
         
         // Desenha os marcadores e números
-        for (int i = 0; i <= rightHorizonLimit; i++) {
-            int x = 50 + (i * SCALE);
-            
-            // Marcador principal a cada 5 unidades
-            if (i % 5 == 0) {
-                g2d.drawLine(x, GROUND_Y + 15, x, GROUND_Y + 25);
-                g2d.drawString(Integer.toString(i), x - 5, GROUND_Y + 40);
-            } 
-            // Marcador menor para as outras unidades
-            else {
-                g2d.drawLine(x, GROUND_Y + 18, x, GROUND_Y + 22);
-            }
+        int step = (int) rightHorizonLimit / 10;
+        double proportionalCoef = (WIDTH - 2 * lineOffset) / (double) rightHorizonLimit;
+
+        for (int i = 0; i <= rightHorizonLimit; i += step) {
+            int x = (int) (i * proportionalCoef) + lineOffset;
+            g2d.drawLine(x, GROUND_Y + 15, x, GROUND_Y + 25);
+            g2d.drawString(String.valueOf(i), x - 5, GROUND_Y + 40);
         }
     }
     
@@ -214,10 +208,10 @@ private BufferedImage colorizeSprite(BufferedImage original, int id) {
         g2d.drawString("Simulação de Duendes - Movendo e Roubando Ouro", 20, 20);
     }
     
-    public static void showSimulation(List<Duende> duendes, int leftHorizonLimit, int rightHorizonLimit) {
+    public static void showSimulation(List<Duende> duendes, int rightHorizonLimit) {
         JFrame frame = new JFrame("Simulação de Duendes");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SimulationPanel(duendes, leftHorizonLimit, rightHorizonLimit));
+        frame.add(new SimulationView(duendes, rightHorizonLimit));
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

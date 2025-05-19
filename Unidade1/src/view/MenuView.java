@@ -19,7 +19,6 @@ public class MenuView {
     private static JFrame frame;
     private static JPanel inputPanel;
     private static JTextField inputField;
-    private static JTextField minField;
     private static JTextField maxField;
     private static JTextField stopField;
 
@@ -51,15 +50,6 @@ public class MenuView {
         JPanel horizontePanel = new JPanel(new GridLayout(1, 2, 10, 0));
         horizontePanel.setBorder(BorderFactory.createTitledBorder("Configuração do Horizonte"));
 
-        // Campo para valor mínimo do horizonte
-        JPanel minPanel = new JPanel(new BorderLayout(5, 5));
-        JLabel minLabel = new JLabel("Valor Mínimo:", SwingConstants.LEFT);
-        minLabel.setFont(fontLabel);
-        minField = new JTextField();
-        minField.setFont(fontField);
-        minPanel.add(minLabel, BorderLayout.NORTH);
-        minPanel.add(minField, BorderLayout.CENTER);
-
         // Campo para valor máximo do horizonte
         JPanel maxPanel = new JPanel(new BorderLayout(5, 5));
         JLabel maxLabel = new JLabel("Valor Máximo:", SwingConstants.LEFT);
@@ -69,7 +59,6 @@ public class MenuView {
         maxPanel.add(maxLabel, BorderLayout.NORTH);
         maxPanel.add(maxField, BorderLayout.CENTER);
 
-        horizontePanel.add(minPanel);
         horizontePanel.add(maxPanel);
 
         // Novo campo para Ponto de Parada

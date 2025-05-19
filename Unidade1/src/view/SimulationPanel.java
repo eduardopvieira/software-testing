@@ -132,7 +132,7 @@ public class SimulationPanel extends JPanel {
             duendes.forEach(d -> drawDuendeWithSprite(g2d, d));
         }
         
-        drawInfo(g2d);
+        //drawInfo(g2d);
         drawTop5Table(g2d);
     }
 
@@ -151,27 +151,27 @@ public class SimulationPanel extends JPanel {
         g2d.drawString("$" + (duende.getCoins()/1000) + "k", x + 10, y + 80);
     }
 
-    private void drawDuendeFallback(Graphics2D g2d, Duende duende) {
-        int x = (int)(duende.getPosition() * 15) + 50 - 15;
-        int y = GROUND_Y - 60;
+    // private void drawDuendeFallback(Graphics2D g2d, Duende duende) {
+    //     int x = (int)(duende.getPosition() * 15) + 50 - 15;
+    //     int y = GROUND_Y - 60;
         
-        // Gera uma cor baseada no ID do duende
-        Color color = new Color(
-            50 + (duende.getId() * 30) % 200,
-            50 + (duende.getId() * 70) % 200,
-            50 + (duende.getId() * 110) % 200
-        );
+    //     // Gera uma cor baseada no ID do duende
+    //     Color color = new Color(
+    //         50 + (duende.getId() * 30) % 200,
+    //         50 + (duende.getId() * 70) % 200,
+    //         50 + (duende.getId() * 110) % 200
+    //     );
         
-        // Desenha um duende básico (cabeça + corpo)
-        g2d.setColor(color);
-        g2d.fillOval(x, y - 30, 30, 30); // Cabeça
-        g2d.fillRect(x + 5, y, 20, 30); // Corpo
+    //     // Desenha um duende básico (cabeça + corpo)
+    //     g2d.setColor(color);
+    //     g2d.fillOval(x, y - 30, 30, 30); // Cabeça
+    //     g2d.fillRect(x + 5, y, 20, 30); // Corpo
         
-        // Olhos
-        g2d.setColor(Color.WHITE);
-        g2d.fillOval(x + 5, y - 25, 8, 8);  // Olho esquerdo
-        g2d.fillOval(x + 17, y - 25, 8, 8); // Olho direito
-    }
+    //     // Olhos
+    //     g2d.setColor(Color.WHITE);
+    //     g2d.fillOval(x + 5, y - 25, 8, 8);  // Olho esquerdo
+    //     g2d.fillOval(x + 17, y - 25, 8, 8); // Olho direito
+    // }
 
     private void drawBackground(Graphics2D g2d) {
         // Céu
@@ -182,24 +182,18 @@ public class SimulationPanel extends JPanel {
         g2d.setColor(new Color(34, 139, 34));
         g2d.fillRect(0, GROUND_Y, getWidth(), getHeight() - GROUND_Y);
         
-        // Linha de chegada (usando posição normalizada)
-        int chegadaX = normalizePosition(params.getPontoParada());
-        g2d.setColor(Color.RED);
-        g2d.fillRect(chegadaX - 25, GROUND_Y - 150, 50, 150);
-        g2d.setColor(Color.WHITE);
-        g2d.drawString("CHEGADA", chegadaX - 30, GROUND_Y - 160);
     }
 
-    private void drawInfo(Graphics2D g2d) {
-        g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Arial", Font.BOLD, 14));
-        g2d.drawString("Simulação de Duendes - Movendo e Roubando Ouro", 20, 20);
-    }
+    // private void drawInfo(Graphics2D g2d) {
+    //     g2d.setColor(Color.BLACK);
+    //     g2d.setFont(new Font("Arial", Font.BOLD, 14));
+    //     g2d.drawString("Simulação de Duendes - Movendo e Roubando Ouro", 20, 20);
+    // }
 
     private void drawTop5Table(Graphics2D g2d) {
         // Ordena os duendes por posição (maior primeiro)
         List<Duende> sorted = new ArrayList<>(duendes);
-        sorted.sort((d1, d2) -> Double.compare(d2.getPosition(), d1.getPosition()));
+        sorted.sort((d1, d2) -> Double.compare(d2.getCoins(), d1.getCoins()));
 
         // Define a área da tabela
         int tableX = WIDTH - TABLE_WIDTH - 20;
@@ -223,8 +217,8 @@ public class SimulationPanel extends JPanel {
         int limit = Math.min(5, sorted.size());
         for (int i = 0; i < limit; i++) {
             Duende d = sorted.get(i);
-            String line = String.format("#Duende %d: Pos [%.1f] - Gold [%dk]", 
-                                    d.getId(), d.getPosition(), d.getCoins()/1000);
+            String line = String.format("#Duende %d: Gold [%dk] - Pos [%.1f]", 
+                                    d.getId(), d.getCoins()/1000, d.getPosition());
             g2d.drawString(line, tableX + 10, tableY + yOffset);
             yOffset += 20;
         }

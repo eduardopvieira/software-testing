@@ -2,19 +2,17 @@ package model;
 
 import java.util.Random;
 
+import Controller.SimulationController;
+
 public class Duende {
     private int id;
     private long coins;
     private double position;
-    private double minHorizon, maxHorizon; //precisam desses parametros pra limitar o movimento
 
-    public Duende(int id, double minHorizon, double maxHorizon) {
+    public Duende(int id) {
         this.id = id;
         this.coins = 1000000L;
         this.position = id * 0.1; // Posição inicial baseada no ID
-        this.minHorizon = minHorizon;
-        this.maxHorizon = maxHorizon;
-
     }
 
     public void move() {
@@ -22,12 +20,12 @@ public class Duende {
         double posAntiga = getPosition();
         double movimento = random.nextDouble() * 2 - 1; // -1 a 1
 
-        double newPos = posAntiga + (movimento * (this.coins/100000));
+        double newPos = posAntiga + movimento * this.coins;
         
-        if (newPos < minHorizon) {
-            newPos = minHorizon;
-        } else if (newPos > maxHorizon) {
-            newPos = maxHorizon;
+        if (newPos > SimulationController.getMaxHorizon()) {
+            newPos = SimulationController.getMaxHorizon();
+        } else if (newPos < 0) {
+            newPos = 0;
         }
 
         this.setPosition(newPos);

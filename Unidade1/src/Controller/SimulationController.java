@@ -9,15 +9,19 @@ import javax.swing.SwingUtilities;
 
 import datastructure.TreeMapAdaptado;
 import model.Duende;
-import model.Horizon;
 import view.SimulationView;
 
 public class SimulationController {
-    public static void iniciarSimulacao(int numDuendes, int maxHorizon) {
+    private static long maxCoins;
+    private static int maxHorizon;
+
+    public static void iniciarSimulacao(int numDuendes, int maxHorizon, long maxCoins) {
+        SimulationController.maxCoins = maxCoins;
+        SimulationController.maxHorizon = maxHorizon;
+
         List<Duende> duendes = criarDuendes(numDuendes);
         TreeMapAdaptado tma = inicializarTreeMap(duendes);
-        Horizon.setRightLimit(maxHorizon);
-        SimulationView panel = criarEExibirJanela(duendes, maxHorizon);
+        SimulationView panel = criarEExibirJanela(duendes);
         executarLogicaSimulacao(duendes, tma, panel);
     }
 
@@ -35,8 +39,8 @@ public class SimulationController {
         return tma;
     }
 
-    private static SimulationView criarEExibirJanela(List<Duende> duendes, int maxHorizon) {
-        SimulationView panel = new SimulationView(duendes, maxHorizon);
+    private static SimulationView criarEExibirJanela(List<Duende> duendes) {
+        SimulationView panel = new SimulationView(duendes);
         JFrame simulationFrame = new JFrame("Simulação de Duendes");
         simulationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         simulationFrame.add(panel);
@@ -55,27 +59,26 @@ public class SimulationController {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
-                alguemChegou = processarMovimentoDuendes(duendes, tma, panel);
+                for (Duende duende : duendes) {
+                    moverERoubar(duende, tma, panel);
+
+                    // Verifica após cada movimento se alguém atingiu o critério
+                    if (verificarChegada(duende, SimulationController.maxCoins)) {
+                        alguemChegou = true;
+                        break; // Sai do loop de duendes
+                    }
+
+                    pausaVisualizacao();
+                }
 
                 if (alguemChegou) {
                     exibirResultadosFinais(duendes);
+                    break; // Sai do loop principal
                 }
             }
         }).start();
     }
 
-    private static boolean processarMovimentoDuendes(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
-        for (Duende duende : duendes) {
-            moverERoubar(duende, tma, panel);
-
-            if (verificarChegada(duende)) {
-                return true;
-            }
-
-            pausaVisualizacao();
-        }
-        return false;
-    }
 
     private static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
         SwingUtilities.invokeLater(() -> {
@@ -87,15 +90,17 @@ public class SimulationController {
             if (vitima != null && vitima != duende) {
                 duende.steal(vitima);
             }
-
-            panel.repaint();
         });
+        panel.repaint();
     }
 
-    private static boolean verificarChegada(Duende duende) {
-        if (duende.getPosition() >= Horizon.getRightLimit() - 1) {
-            System.out.println("Duende " + duende.getId() + " chegou ao final!");
-            System.out.println(Horizon.getRightLimit() - 1);
+    private static boolean verificarChegada(Duende duende, Long maxCoins) {
+        if (duende.getCoins() >= maxCoins) {
+            System.out.println("Duende " + duende.getId() + " atingiu " + duende.getCoins() + 
+                            " moedas (limite: " + maxCoins + ")");
+            return true;
+        } else if (duende.getPosition() >= maxHorizon) {
+            System.out.println("Duende " + duende.getId() + " atingiu o horizonte máximo (" + maxHorizon + ")");
             return true;
         }
         return false;
@@ -111,22 +116,31 @@ public class SimulationController {
 
     private static void exibirResultadosFinais(List<Duende> duendes) {
         System.out.println("\nResultado Final:");
-        duendes.forEach(d ->
-                System.out.println("Duende " + d.getId() + ": " + d.getOuro() + " Dinheiros")
-        );
+
+        List<Duende> sorted = new ArrayList<>(duendes);
+        sorted.sort((d1, d2) -> Double.compare(d2.getCoins(), d1.getCoins()));
+
+        sorted.forEach(d -> System.out.println("Duende " + d.getId() + ": " + d.getCoins() + " Moedas"));
 
         SwingUtilities.invokeLater(() -> {
             StringBuilder resultados = new StringBuilder("Resultado Final:\n");
-            duendes.forEach(d ->
-                    resultados.append("Duende ").append(d.getId())
-                            .append(": ").append(d.getOuro())
-                            .append(" Dinheiros\n")
-            );
+            sorted.forEach(d -> resultados.append("Duende ").append(d.getId())
+                    .append(": ").append(d.getCoins())
+                    .append(" Moedas\n"));
 
             JOptionPane.showMessageDialog(null,
                     resultados.toString(),
                     "Fim da Simulação",
                     JOptionPane.INFORMATION_MESSAGE);
         });
+    }
+
+
+    public static long getMaxCoins() {
+        return maxCoins;
+    }
+
+    public static int getMaxHorizon() {
+        return maxHorizon;
     }
 }

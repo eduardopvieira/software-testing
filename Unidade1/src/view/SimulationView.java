@@ -1,6 +1,9 @@
 package view;
 
 import javax.swing.*;
+
+import Controller.SimulationController;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -9,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import javax.imageio.ImageIO;
 import model.Duende;
-import model.SimulacaoParams;
 
 public class SimulationView extends JPanel {
     private static final int WIDTH = 800;
@@ -20,13 +22,10 @@ public class SimulationView extends JPanel {
     
     private final List<Duende> duendes;
     private final HashMap<Integer, BufferedImage> sprites;
-    private final SimulacaoParams params;
     
-    public SimulationPanel(List<Duende> duendes, SimulacaoParams params) {
+    public SimulationView(List<Duende> duendes) {
         this.duendes = duendes;
         this.sprites = new HashMap<>();
-        this.params = params;
-        ;
         
         loadSprites();
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -36,7 +35,7 @@ public class SimulationView extends JPanel {
     // Método para normalizar a posição para o intervalo [0, WIDTH-100]
     private int normalizePosition(double position) {
         // Calcula a posição relativa dentro do horizonte
-        double relativePosition = (position - params.getMinHorizon()) / (params.getMaxHorizon() - params.getMinHorizon());
+        double relativePosition = position / SimulationController.getMaxHorizon();
         // Mapeia para as coordenadas da tela (com margens de 50px em cada lado)
         return 50 + (int)(relativePosition * (WIDTH - 100));
     }
@@ -127,6 +126,7 @@ public class SimulationView extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         
         drawBackground(g2d);
+        drawGroundScale(g2d);
         
         synchronized (duendes) {
             duendes.forEach(d -> drawDuendeWithSprite(g2d, d));
@@ -184,6 +184,26 @@ public class SimulationView extends JPanel {
         
     }
 
+    private void drawGroundScale(Graphics2D g2d) {
+        g2d.setColor(Color.BLACK);
+        g2d.setFont(new Font("Arial", Font.PLAIN, 10));
+
+        int lineOffset = 50;
+        
+        // Desenha a linha de escala
+        g2d.drawLine(lineOffset, GROUND_Y + 20, WIDTH-lineOffset, GROUND_Y + 20);
+        
+        // Desenha os marcadores e números
+        int step = (int) SimulationController.getMaxHorizon() / 10;
+        double proportionalCoef = (WIDTH - 2 * lineOffset) / (double) SimulationController.getMaxHorizon();
+
+        for (int i = 0; i <= SimulationController.getMaxHorizon(); i += step) {
+            int x = (int) (i * proportionalCoef) + lineOffset;
+            g2d.drawLine(x, GROUND_Y + 15, x, GROUND_Y + 25);
+            g2d.drawString(String.valueOf(i), x - 5, GROUND_Y + 40);
+        }
+    }
+
     // private void drawInfo(Graphics2D g2d) {
     //     g2d.setColor(Color.BLACK);
     //     g2d.setFont(new Font("Arial", Font.BOLD, 14));
@@ -224,16 +244,12 @@ public class SimulationView extends JPanel {
         }
     }
 
-    public static void showSimulation(List<Duende> duendes, SimulacaoParams params) {
+    public static void showSimulation(List<Duende> duendes) {
         JFrame frame = new JFrame("Simulação de Duendes");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SimulationPanel(duendes, params));
+        frame.add(new SimulationView(duendes));
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-    }
-
-    public SimulacaoParams getParams() {
-        return params;
     }
 }

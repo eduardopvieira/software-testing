@@ -1,11 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import model.Duende;
+import model.SimulacaoParams;
 import model.TreeMapAdaptado;
 import view.SimulationPanel;
 
@@ -15,6 +14,7 @@ public class Main {
     private static JTextField inputField;
     private static JTextField minField;
     private static JTextField maxField;
+    private static JTextField stopField;
 
     public static void main(String[] args) {
         criarJanelaInput();
@@ -23,7 +23,7 @@ public class Main {
     private static void criarJanelaInput() {
         frame = new JFrame("Configuração da Simulação");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(450, 300); // Aumentei o tamanho para acomodar os novos campos
+        frame.setSize(450, 350); // Aumentei a altura para acomodar o novo campo
         frame.setLayout(new BorderLayout());
 
         // Painel principal com bordas e espaçamento
@@ -34,7 +34,7 @@ public class Main {
         // Configuração de fonte para reutilização
         Font fontLabel = new Font("Arial", Font.BOLD, 14);
         Font fontField = new Font("Arial", Font.PLAIN, 14);
-        
+
         // Campo para número de duendes
         JPanel duendesPanel = new JPanel(new BorderLayout(5, 5));
         JLabel duendesLabel = new JLabel("Digite o número de duendes:", SwingConstants.LEFT);
@@ -43,11 +43,11 @@ public class Main {
         inputField.setFont(fontField);
         duendesPanel.add(duendesLabel, BorderLayout.NORTH);
         duendesPanel.add(inputField, BorderLayout.CENTER);
-        
+
         // Painel para os valores do horizonte (máximo e mínimo)
         JPanel horizontePanel = new JPanel(new GridLayout(1, 2, 10, 0));
         horizontePanel.setBorder(BorderFactory.createTitledBorder("Configuração do Horizonte"));
-        
+
         // Campo para valor mínimo do horizonte
         JPanel minPanel = new JPanel(new BorderLayout(5, 5));
         JLabel minLabel = new JLabel("Valor Mínimo:", SwingConstants.LEFT);
@@ -56,7 +56,7 @@ public class Main {
         minField.setFont(fontField);
         minPanel.add(minLabel, BorderLayout.NORTH);
         minPanel.add(minField, BorderLayout.CENTER);
-        
+
         // Campo para valor máximo do horizonte
         JPanel maxPanel = new JPanel(new BorderLayout(5, 5));
         JLabel maxLabel = new JLabel("Valor Máximo:", SwingConstants.LEFT);
@@ -65,23 +65,34 @@ public class Main {
         maxField.setFont(fontField);
         maxPanel.add(maxLabel, BorderLayout.NORTH);
         maxPanel.add(maxField, BorderLayout.CENTER);
-        
+
         horizontePanel.add(minPanel);
         horizontePanel.add(maxPanel);
-        
+
+        // Novo campo para Ponto de Parada
+        JPanel stopPanel = new JPanel(new BorderLayout(5, 5));
+        JLabel stopLabel = new JLabel("Maximo de moedas:", SwingConstants.LEFT);
+        stopLabel.setFont(fontLabel);
+        stopField = new JTextField();
+        stopField.setFont(fontField);
+        stopPanel.add(stopLabel, BorderLayout.NORTH);
+        stopPanel.add(stopField, BorderLayout.CENTER);
+
         // Botão de iniciar simulação
         JButton startButton = new JButton("Iniciar Simulação");
         startButton.setFont(new Font("Arial", Font.BOLD, 14));
         startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         startButton.addActionListener(e -> iniciarSimulacao());
-        
+
         // Adiciona os componentes ao painel principal com espaçamento
         inputPanel.add(duendesPanel);
-        inputPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Espaço entre componentes
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         inputPanel.add(horizontePanel);
-        inputPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Mais espaço antes do botão
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        inputPanel.add(stopPanel);
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         inputPanel.add(startButton);
-        
+
         frame.add(inputPanel, BorderLayout.CENTER);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -92,6 +103,31 @@ public class Main {
             int numDuendes = Integer.parseInt(inputField.getText());
             int minHorizon = Integer.parseInt(minField.getText());
             int maxHorizon = Integer.parseInt(maxField.getText());
+            Long maxCoins = Long.parseLong(stopField.getText());
+
+            if (minHorizon >= maxHorizon) {
+                JOptionPane.showMessageDialog(frame,
+                        "O valor mínimo do horizonte deve ser menor que o máximo.",
+                        "Entrada inválida",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (maxCoins <= 0) {
+                JOptionPane.showMessageDialog(frame,
+                        "O ponto de parada deve ser maior que zero.",
+                        "Entrada inválida",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (maxCoins > numDuendes * 1000000) {
+                JOptionPane.showMessageDialog(frame,
+                        "O ponto de parada não pode ser maior que o valor total de moedas na simulação.",
+                        "Entrada inválida",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
             if (numDuendes < 1 || numDuendes > 20) {
                 JOptionPane.showMessageDialog(frame,
@@ -104,9 +140,11 @@ public class Main {
             frame.remove(inputPanel);
             frame.dispose();
 
-            List<Duende> duendes = criarDuendes(numDuendes);
+            SimulacaoParams params = new SimulacaoParams(minHorizon, maxHorizon, maxCoins);
+
+            List<Duende> duendes = criarDuendes(numDuendes, params.getMinHorizon(), params.getMaxHorizon());
             TreeMapAdaptado tma = inicializarTreeMap(duendes);
-            SimulationPanel panel = criarEExibirJanela(duendes, minHorizon, maxHorizon);
+            SimulationPanel panel = criarEExibirJanela(duendes, params);
             executarLogicaSimulacao(duendes, tma, panel);
 
         } catch (NumberFormatException ex) {
@@ -117,10 +155,10 @@ public class Main {
         }
     }
 
-    private static List<Duende> criarDuendes(int quantidade) {
+    private static List<Duende> criarDuendes(int quantidade, double minHorizon, double maxHorizon) {
         List<Duende> duendes = new ArrayList<>();
         for (int i = 0; i < quantidade; i++) {
-            duendes.add(new Duende(i));
+            duendes.add(new Duende(i, minHorizon, maxHorizon));
         }
         return duendes;
     }
@@ -131,8 +169,8 @@ public class Main {
         return tma;
     }
 
-    private static SimulationPanel criarEExibirJanela(List<Duende> duendes, int minHorizon, int maxHorizon) {
-        SimulationPanel panel = new SimulationPanel(duendes, minHorizon, maxHorizon);
+    private static SimulationPanel criarEExibirJanela(List<Duende> duendes, SimulacaoParams params) {
+        SimulationPanel panel = new SimulationPanel(duendes, params);
         JFrame simulationFrame = new JFrame("Simulação de Duendes");
         simulationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         simulationFrame.add(panel);
@@ -151,27 +189,26 @@ public class Main {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
-                alguemChegou = processarMovimentoDuendes(duendes, tma, panel);
+                for (Duende duende : duendes) {
+                    moverERoubar(duende, tma, panel);
+
+                    // Verifica após cada movimento se alguém atingiu o critério
+                    if (verificarChegada(duende, panel.getParams().getMaxCoinsLong())) {
+                        alguemChegou = true;
+                        break; // Sai do loop de duendes
+                    }
+
+                    pausaVisualizacao();
+                }
 
                 if (alguemChegou) {
                     exibirResultadosFinais(duendes);
+                    break; // Sai do loop principal
                 }
             }
         }).start();
     }
 
-    private static boolean processarMovimentoDuendes(List<Duende> duendes, TreeMapAdaptado tma, SimulationPanel panel) {
-        for (Duende duende : duendes) {
-            moverERoubar(duende, tma, panel);
-
-            if (verificarChegada(duende)) {
-                return true;
-            }
-
-            pausaVisualizacao();
-        }
-        return false;
-    }
 
     private static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationPanel panel) {
         SwingUtilities.invokeLater(() -> {
@@ -183,14 +220,14 @@ public class Main {
             if (vitima != null && vitima != duende) {
                 duende.steal(vitima);
             }
-
-            panel.repaint();
         });
+        panel.repaint();
     }
 
-    private static boolean verificarChegada(Duende duende) {
-        if (duende.getPosition() >= 29) {
-            System.out.println("Duende " + duende.getId() + " chegou ao final!");
+    private static boolean verificarChegada(Duende duende, Long maxCoins) {
+        if (duende.getCoins() >= maxCoins) {
+            System.out.println("Duende " + duende.getId() + " atingiu " + duende.getCoins() + 
+                            " moedas (limite: " + maxCoins + ")");
             return true;
         }
         return false;
@@ -206,17 +243,17 @@ public class Main {
 
     private static void exibirResultadosFinais(List<Duende> duendes) {
         System.out.println("\nResultado Final:");
-        duendes.forEach(d ->
-                System.out.println("Duende " + d.getId() + ": " + d.getMoney() + " Dinheiros")
-        );
+
+        List<Duende> sorted = new ArrayList<>(duendes);
+        sorted.sort((d1, d2) -> Double.compare(d2.getCoins(), d1.getCoins()));
+
+        sorted.forEach(d -> System.out.println("Duende " + d.getId() + ": " + d.getCoins() + " Moedas"));
 
         SwingUtilities.invokeLater(() -> {
             StringBuilder resultados = new StringBuilder("Resultado Final:\n");
-            duendes.forEach(d ->
-                    resultados.append("Duende ").append(d.getId())
-                            .append(": ").append(d.getMoney())
-                            .append(" Dinheiros\n")
-            );
+            sorted.forEach(d -> resultados.append("Duende ").append(d.getId())
+                    .append(": ").append(d.getCoins())
+                    .append(" Moedas\n"));
 
             JOptionPane.showMessageDialog(null,
                     resultados.toString(),

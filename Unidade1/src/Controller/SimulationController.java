@@ -97,47 +97,41 @@ public class SimulationController {
                 for (Duende duende : duendes) {
                     moverERoubar(duende, tma, panel);
 
-                    if (verificarChegada(duende, SimulationController.maxCoins)) {
+                    // Verifica após cada movimento se alguém atingiu o critério
+                    if (verificarChegada(duende)) {
                         alguemChegou = true;
-                        //pausaVisualizacao();
-                        break;
+                        break; // Interrompe os duendes
                     }
+                  
                     pausaVisualizacao();
-
-                }
-
-                if (alguemChegou) {
-                    exibirResultadosFinais(duendes);
-                    break;
                 }
             }
+
+            exibirResultadosFinais(duendes);
         }).start();
     }
 
 
     private static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
-
         //! Teste de pré-condição
         if (duende == null || tma == null || panel == null) {
             throw new IllegalArgumentException("Parâmetros não podem ser nulos.");
         }
+  
+        tma.treeMapPrincipal.remove(duende.getPosition());
+        duende.move();
+        tma.addDuende(duende);
 
-        SwingUtilities.invokeLater(() -> {
-            tma.treeMapPrincipal.remove(duende.getPosition());
-            duende.move();
-            tma.addDuende(duende);
+        Duende vitima = tma.findNearestDuende(duende);
+        if (vitima != null && vitima != duende) {
+            duende.steal(vitima);
+        }
 
-            Duende vitima = tma.findNearestDuende(duende);
-            if (vitima != null && vitima != duende) {
-                duende.steal(vitima);
-            }
-        });
-        //!Não há teste de pós-condição. Função é void.
         panel.repaint();
     }
 
-    private static boolean verificarChegada(Duende duende, Long maxCoins) {
-
+  
+    private static boolean verificarChegada(Duende duende) {
         //! Teste de pré-condição
         if (duende == null) {
             throw new IllegalArgumentException("Duende não pode ser nulo.");
@@ -147,11 +141,13 @@ public class SimulationController {
             System.out.println("Duende " + duende.getId() + " atingiu " + duende.getCoins() + 
                             " moedas (limite: " + maxCoins + ")");
             return true;
-
-        } else if (duende.getPosition() >= maxHorizon) {
+        }
+        
+        if (duende.getPosition() >= maxHorizon) {
             System.out.println("Duende " + duende.getId() + " atingiu o horizonte máximo (" + maxHorizon + ")");
             return true;
         }
+
         return false;
     }
 

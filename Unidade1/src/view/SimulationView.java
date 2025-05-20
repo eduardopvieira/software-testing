@@ -1,8 +1,8 @@
-package view;
+package src.view;
 
 import javax.swing.*;
 
-import Controller.SimulationController;
+import src.Controller.SimulationController;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.imageio.ImageIO;
-import model.Duende;
+import src.model.Duende;
 
 public class SimulationView extends JPanel {
     private static final int WIDTH = 800;
@@ -40,7 +40,7 @@ public class SimulationView extends JPanel {
     private void loadSprites() {
         try {
             // Tenta carregar usando caminho relativo ao classpath
-            String resourcePath = "/resources/sprites/duende.png";
+            String resourcePath = "../resources/sprites/duende.png";
             BufferedImage originalSprite = ImageIO.read(getClass().getResource(resourcePath));
 
             if (originalSprite != null) {

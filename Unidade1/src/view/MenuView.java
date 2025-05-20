@@ -1,4 +1,4 @@
-package view;
+package src.view;
 
 import java.awt.*;
 
@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import Controller.SimulationController;
+import src.Controller.SimulationController;
 
 public class MenuView {
     private static JFrame frame;

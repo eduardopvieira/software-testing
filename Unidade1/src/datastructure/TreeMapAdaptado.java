@@ -1,11 +1,11 @@
-package datastructure;
+package src.datastructure;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 
-import model.Duende;
+import src.model.Duende;
 
 public class TreeMapAdaptado {
     public TreeMap<Double, Duende> treeMapPrincipal = new TreeMap<>();

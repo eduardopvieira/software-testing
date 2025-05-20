@@ -1,4 +1,4 @@
-package Controller;
+package src.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import datastructure.TreeMapAdaptado;
-import model.Duende;
-import view.SimulationView;
+import src.datastructure.TreeMapAdaptado;
+import src.model.Duende;
+import src.view.SimulationView;
 
 public class SimulationController {
     private static long maxCoins;
@@ -95,13 +95,14 @@ public class SimulationController {
                 System.out.println("\nIteração " + iteracao);
 
                 for (Duende duende : duendes) {
-                    moverERoubar(duende, tma, panel);
 
                     if (verificarChegada(duende, SimulationController.maxCoins)) {
                         alguemChegou = true;
-                        //pausaVisualizacao();
+
                         break;
                     }
+                    moverERoubar(duende, tma, panel);
+
                     pausaVisualizacao();
 
                 }
@@ -132,6 +133,7 @@ public class SimulationController {
                 duende.steal(vitima);
             }
         });
+
         //!Não há teste de pós-condição. Função é void.
         panel.repaint();
     }
@@ -184,10 +186,6 @@ public class SimulationController {
         });
     }
 
-
-    public static long getMaxCoins() {
-        return maxCoins;
-    }
 
     public static int getMaxHorizon() {
         return maxHorizon;

@@ -131,8 +131,7 @@ public class SimulationController {
     }
 
   
-    private static boolean verificarChegada(Duende duende, Long maxCoins) {
-
+    private static boolean verificarChegada(Duende duende) {
         //! Teste de pré-condição
         if (duende == null) {
             throw new IllegalArgumentException("Duende não pode ser nulo.");

@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import src.Controller.SimulationController;
+import Controller.SimulationController;
 
 public class MenuView {
     private static JFrame frame;

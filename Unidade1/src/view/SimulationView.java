@@ -1,8 +1,8 @@
-package src.view;
+package view;
 
 import javax.swing.*;
 
-import src.Controller.SimulationController;
+import Controller.SimulationController;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.imageio.ImageIO;
-import src.model.Duende;
+import model.Duende;
 
 public class SimulationView extends JPanel {
     private static final int WIDTH = 800;

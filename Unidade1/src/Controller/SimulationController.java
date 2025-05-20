@@ -1,4 +1,4 @@
-package src.Controller;
+package Controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import src.datastructure.TreeMapAdaptado;
-import src.model.Duende;
-import src.view.SimulationView;
+import datastructure.TreeMapAdaptado;
+import model.Duende;
+import view.SimulationView;
 
 public class SimulationController {
     private static long maxCoins;
@@ -28,7 +28,7 @@ public class SimulationController {
         executarLogicaSimulacao(duendes, tma, panel);
     }
 
-    private static List<Duende> criarDuendes(int quantidade) {
+    public static List<Duende> criarDuendes(int quantidade) {
 
         //! Teste de pré-condição
         if (quantidade <= 1 || quantidade > 20) {
@@ -48,7 +48,7 @@ public class SimulationController {
         return duendes;
     }
 
-    private static TreeMapAdaptado inicializarTreeMap(List<Duende> duendes) {
+    public static TreeMapAdaptado inicializarTreeMap(List<Duende> duendes) {
         //! Teste de pré-condição
         if (duendes == null || duendes.isEmpty()) {
             throw new IllegalArgumentException("A lista de duendes não pode ser nula ou vazia.");
@@ -116,7 +116,7 @@ public class SimulationController {
     }
 
 
-    private static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
+    public static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
 
         //! Teste de pré-condição
         if (duende == null || tma == null || panel == null) {
@@ -138,7 +138,7 @@ public class SimulationController {
         panel.repaint();
     }
 
-    private static boolean verificarChegada(Duende duende, Long maxCoins) {
+    public static boolean verificarChegada(Duende duende, Long maxCoins) {
 
         //! Teste de pré-condição
         if (duende == null) {

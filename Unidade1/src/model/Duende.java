@@ -1,8 +1,8 @@
-package src.model;
+package model;
 
 import java.util.Random;
 
-import src.Controller.SimulationController;
+import Controller.SimulationController;
 
 public class Duende {
     private int id;
@@ -53,4 +53,8 @@ public class Duende {
     public Long getCoins() { return coins; }
     public double getPosition() { return position; }
     public void setPosition(double position) { this.position = position; }
+
+    public void setCoins(Long i) {
+        this.coins = i;
+    }
 }

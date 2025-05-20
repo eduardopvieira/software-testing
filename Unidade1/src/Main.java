@@ -1,5 +1,3 @@
-package src;
-
 import src.view.MenuView;
 
 public class Main {

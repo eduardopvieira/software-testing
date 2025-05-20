@@ -63,46 +63,45 @@ public class SimulationController {
                     moverERoubar(duende, tma, panel);
 
                     // Verifica após cada movimento se alguém atingiu o critério
-                    if (verificarChegada(duende, SimulationController.maxCoins)) {
+                    if (verificarChegada(duende)) {
                         alguemChegou = true;
-                        break; // Sai do loop de duendes
+                        break; // Interrompe os duendes
                     }
 
                     pausaVisualizacao();
                 }
-
-                if (alguemChegou) {
-                    exibirResultadosFinais(duendes);
-                    break; // Sai do loop principal
-                }
             }
+
+            exibirResultadosFinais(duendes);
         }).start();
     }
 
 
     private static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
-        SwingUtilities.invokeLater(() -> {
-            tma.treeMapPrincipal.remove(duende.getPosition());
-            duende.move();
-            tma.addDuende(duende);
+        tma.treeMapPrincipal.remove(duende.getPosition());
+        duende.move();
+        tma.addDuende(duende);
 
-            Duende vitima = tma.findNearestDuende(duende);
-            if (vitima != null && vitima != duende) {
-                duende.steal(vitima);
-            }
-        });
+        Duende vitima = tma.findNearestDuende(duende);
+        if (vitima != null && vitima != duende) {
+            duende.steal(vitima);
+        }
+
         panel.repaint();
     }
 
-    private static boolean verificarChegada(Duende duende, Long maxCoins) {
+    private static boolean verificarChegada(Duende duende) {
         if (duende.getCoins() >= maxCoins) {
             System.out.println("Duende " + duende.getId() + " atingiu " + duende.getCoins() + 
                             " moedas (limite: " + maxCoins + ")");
             return true;
-        } else if (duende.getPosition() >= maxHorizon) {
+        }
+        
+        if (duende.getPosition() >= maxHorizon) {
             System.out.println("Duende " + duende.getId() + " atingiu o horizonte máximo (" + maxHorizon + ")");
             return true;
         }
+
         return false;
     }
 

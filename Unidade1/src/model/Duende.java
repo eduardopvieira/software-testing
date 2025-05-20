@@ -36,7 +36,7 @@ public class Duende {
     private Long giveCoins() {
         Long perdido = this.coins / 2;
         this.coins = this.coins - perdido;
-        System.out.println("O Duende " + id + " perdeu " + perdido + " dinheiros. Coitado.");
+        System.out.println("O Duende " + id + " perdeu " + perdido + " moedas. Coitado.");
         return perdido;
     }
 

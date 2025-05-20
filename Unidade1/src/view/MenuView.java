@@ -91,20 +91,24 @@ public class MenuView {
     }
 
     private static void callSimulacao(JTextField inputField, JTextField maxField) {
+        //! inputField e maxField ja possuem validação própria do Swing.
+
         try {
             int numDuendes = Integer.parseInt(inputField.getText());
             int maxHorizon = Integer.parseInt(maxField.getText());
             Long maxCoins = Long.parseLong(stopField.getText());
 
+            //! Teste de pré-condição
             if (maxCoins <= 0) {
                 JOptionPane.showMessageDialog(frame,
-                        "O ponto de parada deve ser maior que zero.",
+                        "O número máximo de moedas deve ser maior que zero.",
                         "Entrada inválida",
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            if (maxCoins > numDuendes * 1000000) {
+            //! Teste de pré-condição
+            if (maxCoins > numDuendes * 1000000L) {
                 JOptionPane.showMessageDialog(frame,
                         "O ponto de parada não pode ser maior que o valor total de moedas na simulação.",
                         "Entrada inválida",
@@ -112,9 +116,19 @@ public class MenuView {
                 return;
             }
 
+            //! Teste de pré-condição
             if (numDuendes < 1 || numDuendes > 20) {
                 JOptionPane.showMessageDialog(frame,
                         "Por favor, digite um número entre 1 e 20",
+                        "Entrada inválida",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            //! Teste de pré-condição
+            if (maxHorizon <= 0) {
+                JOptionPane.showMessageDialog(frame,
+                        "O horizonte máximo deve ser maior que zero.",
                         "Entrada inválida",
                         JOptionPane.WARNING_MESSAGE);
                 return;

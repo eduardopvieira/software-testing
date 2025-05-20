@@ -32,11 +32,8 @@ public class SimulationView extends JPanel {
         setBackground(new Color(173, 216, 230));
     }
 
-    // Método para normalizar a posição para o intervalo [0, WIDTH-100]
     private int normalizePosition(double position) {
-        // Calcula a posição relativa dentro do horizonte
         double relativePosition = position / SimulationController.getMaxHorizon();
-        // Mapeia para as coordenadas da tela (com margens de 50px em cada lado)
         return 50 + (int)(relativePosition * (WIDTH - 100));
     }
 
@@ -151,27 +148,6 @@ public class SimulationView extends JPanel {
         g2d.drawString("$" + (duende.getCoins()/1000) + "k", x + 10, y + 80);
     }
 
-    // private void drawDuendeFallback(Graphics2D g2d, Duende duende) {
-    //     int x = (int)(duende.getPosition() * 15) + 50 - 15;
-    //     int y = GROUND_Y - 60;
-        
-    //     // Gera uma cor baseada no ID do duende
-    //     Color color = new Color(
-    //         50 + (duende.getId() * 30) % 200,
-    //         50 + (duende.getId() * 70) % 200,
-    //         50 + (duende.getId() * 110) % 200
-    //     );
-        
-    //     // Desenha um duende básico (cabeça + corpo)
-    //     g2d.setColor(color);
-    //     g2d.fillOval(x, y - 30, 30, 30); // Cabeça
-    //     g2d.fillRect(x + 5, y, 20, 30); // Corpo
-        
-    //     // Olhos
-    //     g2d.setColor(Color.WHITE);
-    //     g2d.fillOval(x + 5, y - 25, 8, 8);  // Olho esquerdo
-    //     g2d.fillOval(x + 17, y - 25, 8, 8); // Olho direito
-    // }
 
     private void drawBackground(Graphics2D g2d) {
         // Céu
@@ -203,12 +179,6 @@ public class SimulationView extends JPanel {
             g2d.drawString(String.valueOf(i), x - 5, GROUND_Y + 40);
         }
     }
-
-    // private void drawInfo(Graphics2D g2d) {
-    //     g2d.setColor(Color.BLACK);
-    //     g2d.setFont(new Font("Arial", Font.BOLD, 14));
-    //     g2d.drawString("Simulação de Duendes - Movendo e Roubando Ouro", 20, 20);
-    // }
 
     private void drawTop5Table(Graphics2D g2d) {
         // Ordena os duendes por posição (maior primeiro)

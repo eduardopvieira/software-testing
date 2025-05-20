@@ -16,6 +16,9 @@ public class SimulationController {
     private static int maxHorizon;
 
     public static void iniciarSimulacao(int numDuendes, int maxHorizon, long maxCoins) {
+        //! Os valores de entrada já estão sendo verificados na função
+        //! callSimulacao() da classe MenuView.
+
         SimulationController.maxCoins = maxCoins;
         SimulationController.maxHorizon = maxHorizon;
 
@@ -26,20 +29,48 @@ public class SimulationController {
     }
 
     private static List<Duende> criarDuendes(int quantidade) {
+
+        //! Teste de pré-condição
+        if (quantidade <= 1 || quantidade > 20) {
+            throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
+        }
+
         List<Duende> duendes = new ArrayList<>();
         for (int i = 0; i < quantidade; i++) {
             duendes.add(new Duende(i));
         }
+
+        //! Teste de pós condição
+        if (duendes.size() != quantidade) {
+            throw new IllegalStateException("Erro ao criar a lista de duendes.");
+        }
+
         return duendes;
     }
 
     private static TreeMapAdaptado inicializarTreeMap(List<Duende> duendes) {
+        //! Teste de pré-condição
+        if (duendes == null || duendes.isEmpty()) {
+            throw new IllegalArgumentException("A lista de duendes não pode ser nula ou vazia.");
+        }
+
         TreeMapAdaptado tma = new TreeMapAdaptado();
         duendes.forEach(tma::addDuende);
+
+        //! Teste de pós-condição
+        if (tma.treeMapPrincipal.isEmpty()) {
+            throw new IllegalStateException("Erro ao inicializar o TreeMapAdaptado.");
+        }
         return tma;
     }
 
     private static SimulationView criarEExibirJanela(List<Duende> duendes) {
+
+        //! Teste de pré-condição
+        if (duendes == null || duendes.isEmpty()) {
+            throw new IllegalArgumentException("A lista de duendes não pode ser nula ou vazia.");
+        }
+
         SimulationView panel = new SimulationView(duendes);
         JFrame simulationFrame = new JFrame("Simulação de Duendes");
         simulationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,10 +78,14 @@ public class SimulationController {
         simulationFrame.pack();
         simulationFrame.setLocationRelativeTo(null);
         simulationFrame.setVisible(true);
+
+        //! Não é necessario teste de pós-condição
         return panel;
     }
 
     private static void executarLogicaSimulacao(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
+        //! Verificação dos parametros já é feita na função iniciarSimulacao() dessa mesma classe
+
         new Thread(() -> {
             int iteracao = 0;
             boolean alguemChegou = false;
@@ -67,7 +102,7 @@ public class SimulationController {
                         alguemChegou = true;
                         break; // Interrompe os duendes
                     }
-
+                  
                     pausaVisualizacao();
                 }
             }
@@ -78,6 +113,11 @@ public class SimulationController {
 
 
     private static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
+        //! Teste de pré-condição
+        if (duende == null || tma == null || panel == null) {
+            throw new IllegalArgumentException("Parâmetros não podem ser nulos.");
+        }
+  
         tma.treeMapPrincipal.remove(duende.getPosition());
         duende.move();
         tma.addDuende(duende);
@@ -90,7 +130,14 @@ public class SimulationController {
         panel.repaint();
     }
 
-    private static boolean verificarChegada(Duende duende) {
+  
+    private static boolean verificarChegada(Duende duende, Long maxCoins) {
+
+        //! Teste de pré-condição
+        if (duende == null) {
+            throw new IllegalArgumentException("Duende não pode ser nulo.");
+        }
+
         if (duende.getCoins() >= maxCoins) {
             System.out.println("Duende " + duende.getId() + " atingiu " + duende.getCoins() + 
                             " moedas (limite: " + maxCoins + ")");

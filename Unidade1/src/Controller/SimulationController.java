@@ -129,24 +129,20 @@ public class SimulationController {
 
 
     public static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
-
         //! Teste de pré-condição
         if (duende == null || tma == null || panel == null) {
             throw new IllegalArgumentException("Parâmetros não podem ser nulos.");
         }
 
-        SwingUtilities.invokeLater(() -> {
-            tma.treeMapPrincipal.remove(duende.getPosition());
-            duende.move();
-            tma.addDuende(duende);
+        tma.treeMapPrincipal.remove(duende.getPosition());
+        duende.move(maxHorizon);
+        tma.addDuende(duende);
 
-            Duende vitima = tma.findNearestDuende(duende);
-            if (vitima != null && vitima != duende) {
-                duende.steal(vitima);
-            }
-        });
+        Duende vitima = tma.findNearestDuende(duende);
+        if (vitima != null && vitima != duende) {
+            duende.steal(vitima);
+        }
 
-        //!Não há teste de pós-condição. Função é void.
         panel.repaint();
     }
 

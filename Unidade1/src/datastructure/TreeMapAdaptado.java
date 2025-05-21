@@ -17,6 +17,8 @@ public class TreeMapAdaptado {
             throw new IllegalArgumentException("Duende não pode ser nulo.");
         }
 
+        //! Essa linha não é pega no teste de coverage pq a classe Duende ja tem uma verificaçao propria
+        //! pra ver se a posição é menor que zero. Nesse caso, dá erro na classe Duende, e nunca vai chegar nessa linha.
         if (duende.getPosition() < 0) {
             throw new IllegalArgumentException("Duende não pode estar em posição negativa.");
         }

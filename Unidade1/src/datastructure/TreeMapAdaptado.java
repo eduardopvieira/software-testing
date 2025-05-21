@@ -17,8 +17,8 @@ public class TreeMapAdaptado {
             throw new IllegalArgumentException("Duende não pode ser nulo.");
         }
 
-        if (duende.getPosition() <= 0) {
-            throw new IllegalArgumentException("Duende não pode estar em posição nula.");
+        if (duende.getPosition() < 0) {
+            throw new IllegalArgumentException("Duende não pode estar em posição negativa.");
         }
 
         double chave = duende.getPosition();

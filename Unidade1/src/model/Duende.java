@@ -2,8 +2,6 @@ package model;
 
 import java.util.Random;
 
-import Controller.SimulationController;
-
 public class Duende {
     private int id;
     private long coins;
@@ -15,15 +13,15 @@ public class Duende {
         this.position = id * 0.1;
     }
 
-    public void move() {
+    public void move(double maxHorizon) {
         Random random = new Random();
         double posAntiga = getPosition();
         double movimento = random.nextDouble() * 2 - 1; // -1 a 1
 
         double newPos = posAntiga + movimento * this.coins;
         
-        if (newPos > SimulationController.getMaxHorizon()) {
-            newPos = SimulationController.getMaxHorizon();
+        if (newPos > maxHorizon) {
+            newPos = maxHorizon;
         } else if (newPos < 0) {
             newPos = 0;
         }
@@ -33,7 +31,7 @@ public class Duende {
         System.out.println("Duende " + this.getId() + " saiu de " + posAntiga + " para " + this.getPosition());
     }
 
-    private Long giveCoins() {
+    public Long giveCoins() {
         Long perdido = this.coins / 2;
         this.coins = this.coins - perdido;
         System.out.println("O Duende " + id + " perdeu " + perdido + " moedas. Coitado.");
@@ -52,7 +50,11 @@ public class Duende {
     public int getId() { return id; }
     public Long getCoins() { return coins; }
     public double getPosition() { return position; }
-    public void setPosition(double position) { this.position = position; }
+    public void setPosition(double position) {
+        if (position < 0) {
+            throw new IllegalArgumentException("Posição não pode ser negativa.");
+        }
+        this.position = position; }
 
     public void setCoins(Long i) {
         this.coins = i;

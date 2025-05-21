@@ -82,28 +82,22 @@ public class SimulationView extends JPanel {
     }
 
     private BufferedImage colorizeSprite(BufferedImage original, int id) {
-        // Cria uma cópia da imagem original
         BufferedImage colored = new BufferedImage(
             original.getWidth(), 
             original.getHeight(), 
             BufferedImage.TYPE_INT_ARGB
         );
         
-        // Aplica uma cor baseada no ID
-        float hue = (id * 0.618f) % 1.0f; // Usa o número áureo para distribuição
+        float hue = (id * 0.618f) % 1.0f;
         Color tint = Color.getHSBColor(hue, 0.7f, 0.9f);
         
-        // Pinta a cópia com a tonalidade
         Graphics2D graph = colored.createGraphics();
         graph.drawImage(original, 0, 0, null);
         
-        // Aplica um filtro de cor
         for (int y = 0; y < colored.getHeight(); y++) {
             for (int x = 0; x < colored.getWidth(); x++) {
                 Color pixelColor = new Color(original.getRGB(x, y), true);
-                // Mantém o alpha (transparência)
                 if (pixelColor.getAlpha() > 0) {
-                    // Mistura a cor original com a tonalidade
                     int r = (int)(pixelColor.getRed() * 0.5 + tint.getRed() * 0.5);
                     int g = (int)(pixelColor.getGreen() * 0.5 + tint.getGreen() * 0.5);
                     int b = (int)(pixelColor.getBlue() * 0.5 + tint.getBlue() * 0.5);
@@ -129,7 +123,6 @@ public class SimulationView extends JPanel {
             duendes.forEach(d -> drawDuendeWithSprite(g2d, d));
         }
         
-        //drawInfo(g2d);
         drawTop5Table(g2d);
     }
 
@@ -166,10 +159,8 @@ public class SimulationView extends JPanel {
 
         int lineOffset = 50;
         
-        // Desenha a linha de escala
         g2d.drawLine(lineOffset, GROUND_Y + 20, WIDTH-lineOffset, GROUND_Y + 20);
         
-        // Desenha os marcadores e números
         int step = (int) SimulationController.getMaxHorizon() / 10;
         double proportionalCoef = (WIDTH - 2 * lineOffset) / (double) SimulationController.getMaxHorizon();
 
@@ -181,29 +172,23 @@ public class SimulationView extends JPanel {
     }
 
     private void drawTop5Table(Graphics2D g2d) {
-        // Ordena os duendes por posição (maior primeiro)
         List<Duende> sorted = new ArrayList<>(duendes);
         sorted.sort((d1, d2) -> Double.compare(d2.getCoins(), d1.getCoins()));
 
-        // Define a área da tabela
         int tableX = WIDTH - TABLE_WIDTH - 20;
         int tableY = 40;
         
-        // Fundo da tabela
         g2d.setColor(new Color(240, 240, 240, 200)); // Semi-transparente
         g2d.fillRoundRect(tableX, tableY, TABLE_WIDTH, TABLE_HEIGHT, 10, 10);
         g2d.setColor(Color.BLACK);
         g2d.drawRoundRect(tableX, tableY, TABLE_WIDTH, TABLE_HEIGHT, 10, 10);
         
-        // Cabeçalho
         g2d.setFont(new Font("Arial", Font.BOLD, 12));
         g2d.drawString("Top 5", tableX + 10, tableY + 20);
         
-        // Linhas dos dados
         g2d.setFont(new Font("Arial", Font.PLAIN, 11));
         int yOffset = 40;
         
-        // Limita aos 5 primeiros
         int limit = Math.min(5, sorted.size());
         for (int i = 0; i < limit; i++) {
             Duende d = sorted.get(i);

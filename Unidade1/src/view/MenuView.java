@@ -23,6 +23,9 @@ public class MenuView {
     private static JTextField stopField;
 
     public static void criarJanelaInput() {
+
+        //! Sem testes de pré ou pós-condição pois não recebe parametros nem retorna nada.
+
         frame = new JFrame("Configuração da Simulação");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(450, 350); // Aumentei a altura para acomodar o novo campo
@@ -91,14 +94,15 @@ public class MenuView {
     }
 
     private static void callSimulacao(JTextField inputField, JTextField maxField) {
-        //! inputField e maxField ja possuem validação própria do Swing.
+        //! inputField e maxField ja possuem validação própria do Swing, portanto, não
+        //! precisam de validação adicional para os parâmetros das função.
 
         try {
             int numDuendes = Integer.parseInt(inputField.getText());
             int maxHorizon = Integer.parseInt(maxField.getText());
             Long maxCoins = Long.parseLong(stopField.getText());
 
-            //! Teste de pré-condição
+            //! Teste de pré-condição (essas condições já são testadas na classe SimulationController)
             if (maxCoins <= 0) {
                 JOptionPane.showMessageDialog(frame,
                         "O número máximo de moedas deve ser maior que zero.",
@@ -117,9 +121,9 @@ public class MenuView {
             }
 
             //! Teste de pré-condição
-            if (numDuendes < 1 || numDuendes > 20) {
+            if (numDuendes < 2 || numDuendes > 20) {
                 JOptionPane.showMessageDialog(frame,
-                        "Por favor, digite um número entre 1 e 20",
+                        "Por favor, digite um número entre 2 e 20",
                         "Entrada inválida",
                         JOptionPane.WARNING_MESSAGE);
                 return;

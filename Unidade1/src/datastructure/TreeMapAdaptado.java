@@ -12,9 +12,13 @@ public class TreeMapAdaptado {
 
     public void addDuende(Duende duende) {
 
-        //!Teste de pré-condição (não tem pós-condição pq a função é void)
+        //!Testes de pré-condição (não tem pós-condição pq a função é void)
         if (duende == null) {
             throw new IllegalArgumentException("Duende não pode ser nulo.");
+        }
+
+        if (duende.getPosition() <= 0) {
+            throw new IllegalArgumentException("Duende não pode estar em posição nula.");
         }
 
         double chave = duende.getPosition();
@@ -33,6 +37,11 @@ public class TreeMapAdaptado {
         if (atual == null) {
             throw new IllegalArgumentException("Duende não pode ser nulo.");
         }
+
+        if (treeMapPrincipal.isEmpty() || treeMapPrincipal.size() == 1) {
+            throw new IllegalStateException("Não há duendes o suficiente na árvore.");
+        }
+
 
         double chaveAtual = atual.getPosition();
         Map.Entry<Double, Duende> anterior = treeMapPrincipal.lowerEntry(chaveAtual);
@@ -63,7 +72,7 @@ public class TreeMapAdaptado {
 
     }
 
-    private Duende verMaisRico(Duende A, Duende B) {
+    public Duende verMaisRico(Duende A, Duende B) {
 
         //!Teste de pré-condição
         if (A == null || B == null) {

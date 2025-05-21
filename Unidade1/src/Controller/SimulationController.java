@@ -76,7 +76,7 @@ public class SimulationController {
         return tma;
     }
 
-    private static SimulationView criarEExibirJanela(List<Duende> duendes) {
+    public static SimulationView criarEExibirJanela(List<Duende> duendes) {
 
         //! Teste de pré-condição
         if (duendes == null || duendes.isEmpty()) {
@@ -95,7 +95,7 @@ public class SimulationController {
         return panel;
     }
 
-    private static void executarLogicaSimulacao(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
+    public static void executarLogicaSimulacao(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
         //! Verificação dos parametros já é feita na função iniciarSimulacao() dessa mesma classe
 
         new Thread(() -> {
@@ -165,7 +165,7 @@ public class SimulationController {
         return false;
     }
 
-    private static void pausaVisualizacao() {
+    public static void pausaVisualizacao() {
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
@@ -173,7 +173,7 @@ public class SimulationController {
         }
     }
 
-    private static void exibirResultadosFinais(List<Duende> duendes) {
+    public static void exibirResultadosFinais(List<Duende> duendes) {
         System.out.println("\nResultado Final:");
 
         List<Duende> sorted = new ArrayList<>(duendes);

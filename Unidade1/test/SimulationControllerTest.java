@@ -13,23 +13,36 @@ public class SimulationControllerTest {
 
     @Test
     public void testCriarDuendesComQuantidadeValida() {
-        List<Duende> duendes = Controller.SimulationController.criarDuendes(5);
-        assertEquals(5, duendes.size());
-        assertEquals(0, duendes.get(0).getId());
+        List<Duende> duendes = Controller.SimulationController.criarDuendes(3);
+        assertEquals(3, duendes.size());
+        assertEquals(0, duendes.getFirst().getId());
     }
 
     @Test
     public void testCriarDuendesComQuantidadeInvalida() {
+        //!Teste de borda
         assertThrows(IllegalArgumentException.class, () -> Controller.SimulationController.criarDuendes(1));
         assertThrows(IllegalArgumentException.class, () -> Controller.SimulationController.criarDuendes(21));
     }
 
     @Test
+    public void testIniciarSimulacaoComPosicaoInvalida() {
+        //!Teste de borda
+        assertThrows(IllegalArgumentException.class, () -> Controller.SimulationController.iniciarSimulacao(2, -1, 100));
+        assertThrows(IllegalArgumentException.class, () -> Controller.SimulationController.iniciarSimulacao(2, 0, 100));
+    }
+
+    @Test
     public void testInicializarTreeMapComDuendesValidos() {
-        List<Duende> duendes = Controller.SimulationController.criarDuendes(3);
+        List<Duende> duendes = Controller.SimulationController.criarDuendes(2);
         TreeMapAdaptado tma = Controller.SimulationController.inicializarTreeMap(duendes);
         assertFalse(tma.treeMapPrincipal.isEmpty());
+
+        List<Duende> duendes2 = Controller.SimulationController.criarDuendes(20);
+        TreeMapAdaptado tma2 = Controller.SimulationController.inicializarTreeMap(duendes2);
+        assertTrue(tma2.treeMapPrincipal.size() > tma.treeMapPrincipal.size());
     }
+
 
     @Test
     public void testInicializarTreeMapComListaNulaOuVazia() {

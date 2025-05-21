@@ -13,11 +13,24 @@ import view.SimulationView;
 
 public class SimulationController {
     private static long maxCoins;
-    private static int maxHorizon;
+    private static double maxHorizon;
 
-    public static void iniciarSimulacao(int numDuendes, int maxHorizon, long maxCoins) {
-        //! Os valores de entrada já estão sendo verificados na função
-        //! callSimulacao() da classe MenuView.
+    public static void iniciarSimulacao(int numDuendes, double maxHorizon, long maxCoins) {
+
+        //!Testes de pré-condicao
+        if (numDuendes <= 1 || numDuendes > 20) {
+            throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
+        }
+        if (maxHorizon <= 0) {
+            throw new IllegalArgumentException("O horizonte máximo deve ser maior que zero.");
+        }
+        if (maxCoins <= 0) {
+            throw new IllegalArgumentException("O número máximo de moedas deve ser maior que zero.");
+        }
+        if (maxCoins > numDuendes * 1000000L) {
+            throw new IllegalArgumentException("O ponto de parada não pode ser maior que o valor total de moedas na simulação.");
+        }
+
 
         SimulationController.maxCoins = maxCoins;
         SimulationController.maxHorizon = maxHorizon;
@@ -29,7 +42,6 @@ public class SimulationController {
     }
 
     public static List<Duende> criarDuendes(int quantidade) {
-
         //! Teste de pré-condição
         if (quantidade <= 1 || quantidade > 20) {
             throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
@@ -187,7 +199,7 @@ public class SimulationController {
     }
 
 
-    public static int getMaxHorizon() {
+    public static double getMaxHorizon() {
         return maxHorizon;
     }
 }

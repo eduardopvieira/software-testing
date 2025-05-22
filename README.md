@@ -79,7 +79,7 @@ Para executar o projeto, siga os passos abaixo:
 2. Clone o repositório:
    ```bash
    git clone https://github.com/eduardopvieira/software-testing
-    cd software-testing
+   cd software-testing
     ```
 3. Navegue até o diretório do projeto
 4. Compile o projeto

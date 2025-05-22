@@ -97,4 +97,31 @@ Para executar o projeto, siga os passos abaixo:
 Os testes foram implementados utilizando o JUnit 5. Todos estão localizados no diretório `test/` e incluem:
 - Testes unitários
 - Testes de pré-condições e pós-condições
-- Testes de branchs
+- Testes de cobertura.
+
+Apenas as classes 'Duende', 'SimulationController' e 'TreeMapAdaptado' possuem teste. Testes nas classes da pasta `view/` não estão no escopo do projeto.
+
+#4.1 Testes na classe Duende:
+1. Testagem de construtor: Verifica se o objeto é criado corretamente com os valores padrão (ID, quantidade inicial de moedas e posição inicial).
+
+2. Teste de movimento dentro do horizonte: Confirma que o duende se move corretamente dentro dos limites estabelecidos (0 a 5 unidades de distância).
+
+3.  Teste de movimento no limite superior: Assegura que o duende não ultrapassa o limite máximo do horizonte (10.0).
+
+4.  Teste de movimento no limite inferior: Garante que o duende não ultrapassa o limite mínimo do horizonte (0.0).
+
+5.  Teste de dar dinheiro: Verifica se o método giveCoins() retorna corretamente metade das moedas do duende e atualiza seu saldo.
+
+6.  Teste de roubo bem-sucedido: Confirma que um duende pode roubar metade das moedas de outro duende, com os valores sendo transferidos corretamente.
+
+7.  Teste de auto-furto: Valida que um duende não pode roubar a si mesmo, lançando uma exceção apropriada.
+
+8.  Teste de roubo com vítima nula: Verifica o tratamento de caso inválido quando se tenta roubar um duende nulo.
+
+9.  Teste de posição válida: Confirma que é possível definir uma posição dentro dos limites permitidos.
+
+10. Teste de posição inválida: Garante que o sistema rejeita posições abaixo do limite mínimo (0.0).
+
+11. Teste de definição de moedas: Verifica se o método setCoins() atualiza corretamente a quantidade de moedas do duende.
+
+Os testes acima garantem uma coverage de 90% (9/10). Os 10% faltantes estão em um if que não conseguimos testar de maneira eficiente por depender de um valor gerado aleatoriamente.

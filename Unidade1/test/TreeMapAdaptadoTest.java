@@ -55,7 +55,7 @@ public class TreeMapAdaptadoTest {
         duendeA.setPosition(10.0);
 
         Duende duendeB = new Duende(6);
-        duendeB.setPosition(10.0); // Posição colidindo
+        duendeB.setPosition(10.0);
 
         treeMapAdaptado.addDuende(duendeA);
         treeMapAdaptado.addDuende(duendeB);
@@ -85,15 +85,27 @@ public class TreeMapAdaptadoTest {
     }
 
     @Test
-    void testFindNearestDuendeComDoisDuendes() {
-        treeMapAdaptado.addDuende(duende1); // posição 10.0
-        treeMapAdaptado.addDuende(duende2); // posição 20.0
+    void testFindNearestDuendeADireitaComDoisDuendes() {
+        treeMapAdaptado.addDuende(duende1);
+        treeMapAdaptado.addDuende(duende2);
 
-        Duende duendeProcurado = new Duende(7);
-        duendeProcurado.setPosition(14.0);
-        duendeProcurado.setCoins(75L);
+        duende1.setPosition(10);
+        duende2.setPosition(20);
 
-        Duende maisProximo = treeMapAdaptado.findNearestDuende(duendeProcurado);
+        Duende maisProximo = treeMapAdaptado.findNearestDuende(duende1);
+
+        assertEquals(duende2, maisProximo);
+    }
+
+    @Test
+    void testFindNearestDuendeAEsquerdaComDoisDuendes() {
+        treeMapAdaptado.addDuende(duende1);
+        treeMapAdaptado.addDuende(duende2);
+
+        duende1.setPosition(10);
+        duende2.setPosition(20);
+
+        Duende maisProximo = treeMapAdaptado.findNearestDuende(duende2);
 
         assertEquals(duende1, maisProximo);
     }
@@ -173,7 +185,6 @@ public class TreeMapAdaptadoTest {
         Duende duendeProcurado = new Duende(14);
         duendeProcurado.setPosition(5.0);
 
-        // Neste caso, só o duende1 (10.0) deve ser considerado
         Duende maisProximo = treeMapAdaptado.findNearestDuende(duendeProcurado);
         assertEquals(duende1, maisProximo);
     }
@@ -195,6 +206,25 @@ public class TreeMapAdaptadoTest {
 
         Duende maisProximo = treeMapAdaptado.findNearestDuende(duendeMeio);
         assertEquals(duendeDireita, maisProximo);
+    }
+
+    @Test
+    void testNearestDuendeAEsquerda() {
+
+        Duende duendeEsquerda = new Duende(1);
+        Duende duendeMeio = new Duende(2);
+        Duende duendeDireita = new Duende(3);
+
+        duendeEsquerda.setPosition(1.0);
+        duendeMeio.setPosition(2.0);
+        duendeDireita.setPosition(11.0);
+
+        treeMapAdaptado.addDuende(duendeEsquerda);
+        treeMapAdaptado.addDuende(duendeMeio);
+        treeMapAdaptado.addDuende(duendeDireita);
+
+        Duende maisProximo = treeMapAdaptado.findNearestDuende(duendeMeio);
+        assertEquals(duendeEsquerda, maisProximo);
     }
 
     @Test

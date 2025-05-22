@@ -19,7 +19,8 @@ public class Duende {
         double movimento = random.nextDouble() * 2 - 1; // -1 a 1
 
         double newPos = posAntiga + movimento * this.coins;
-        
+
+        //! O teste desse trecho depende de aleatoriedade, ja que o valor gerado é random.
         if (newPos > maxHorizon) {
             newPos = maxHorizon;
         } else if (newPos < 0) {
@@ -43,6 +44,8 @@ public class Duende {
             Long roubado = victim.giveCoins();
             this.coins = this.coins + roubado;
             System.out.println("O Duende " + id + " roubou o Duende " + victim.getId() + " com sucesso.");
+        } else {
+            throw new IllegalArgumentException("O duende não pode ser nulo ou roubar a si mesmo.");
         }
     }
 

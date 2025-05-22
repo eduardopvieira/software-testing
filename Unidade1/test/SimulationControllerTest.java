@@ -95,12 +95,17 @@ public class SimulationControllerTest {
     }
 
     @Test
+    public void testCriterioDeParadaPorMoedas() {
+        Duende duende = new Duende(1);
+        assertTrue(Controller.SimulationController.verificarChegada(duende, 1000000L));
+    }
+
+    @Test
     public void testCriarEExibirJanelaComDuendesValidos() {
         List<Duende> duendes = Controller.SimulationController.criarDuendes(2);
         SimulationView panel = Controller.SimulationController.criarEExibirJanela(duendes);
         assertNotNull(panel);
 
-        // Verifica se o frame foi criado
         JFrame frame = (JFrame) panel.getTopLevelAncestor();
         assertNotNull(frame);
         assertEquals("Simulação de Duendes", frame.getTitle());
@@ -165,9 +170,21 @@ public class SimulationControllerTest {
 
     @Test
     public void testVerificarChegadaPorPosicao() {
+        SimulationController.setMaxHorizon(1.0);
         Duende duende = new Duende(1);
-        duende.setPosition(100.0);
-        assertTrue(Controller.SimulationController.verificarChegada(duende, 1000L));
+        duende.setPosition(1);
+        assertTrue(Controller.SimulationController.verificarChegada(duende, 2000000L));
+    }
+
+    @Test
+    public void testVerificarChegadaFalso() {
+        List<Duende> duendes = Controller.SimulationController.criarDuendes(2);
+        SimulationView sv = new SimulationView(duendes);
+        TreeMapAdaptado tm = Controller.SimulationController.inicializarTreeMap(duendes);
+        Controller.SimulationController.setMaxHorizon(1500000);
+        Duende duende = duendes.getFirst();
+
+        assertFalse(Controller.SimulationController.verificarChegada(duende, 1500000L));
     }
 
     @Test
@@ -190,7 +207,6 @@ public class SimulationControllerTest {
         assertEquals(150.0, Controller.SimulationController.getMaxHorizon());
     }
 
-    // Teste para executarLogicaSimulacao (simplificado, já que envolve threads e UI)
     @Test
     public void testExecutarLogicaSimulacaoNaoLancaExcecoes() {
         List<Duende> duendes = Controller.SimulationController.criarDuendes(2);
@@ -201,13 +217,11 @@ public class SimulationControllerTest {
                 Controller.SimulationController.executarLogicaSimulacao(duendes, tma, panel));
     }
 
-    // Teste para pausaVisualizacao (verifica apenas que não lança exceções)
     @Test
     public void testPausaVisualizacaoNaoLancaExcecoes() {
         assertDoesNotThrow(SimulationController::pausaVisualizacao);
     }
 
-    // Teste para exibirResultadosFinais (verifica apenas que não lança exceções)
     @Test
     public void testExibirResultadosFinaisNaoLancaExcecoes() {
         List<Duende> duendes = Controller.SimulationController.criarDuendes(2);

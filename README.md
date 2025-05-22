@@ -1,6 +1,19 @@
 ![saltitantes.png](saltitantes.png)
 
+----
+
 > Saltitantes é uma resolução, em Java, do problema dos duendes saltitantes. Este projeto foi motivado pela disciplina de Teste de Software na UFERSA.
+
+## Índice
+- [1. Problema e Requisitos](#1-problema-e-requisitos)
+- [2. Resolução Proposta](#2-resolução-proposta)
+  - [2.1 Tecnologias Usadas](#21-tecnologias-usadas)
+  - [2.2 Estrutura do Projeto](#22-estrutura-do-projeto)
+  - [2.3 Paralelismo](#23-paralelismo)
+- [3. Execução do Projeto](#3-execução-do-projeto)
+  - [3.1 Setup](#31-setup)
+  - [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
+- [4. Configuração do ambiente de testes](#4-testes)
 
 # 1. Problema e Requisitos
 Implementem, em Java, uma simulação de criaturas saltitantes, conforme requisitos, a seguir:

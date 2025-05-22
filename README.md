@@ -11,9 +11,11 @@
   - [2.2 Estrutura do Projeto](#22-estrutura-do-projeto)
   - [2.3 Paralelismo](#23-paralelismo)
 - [3. Execução do Projeto](#3-execução-do-projeto)
-  - [3.1 Setup](#31-setup)
-  - [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
-- [4. Configuração do ambiente de testes](#4-testes)
+- [3.1 Setup](#31-setup)
+- [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
+- [4. Testes](#4-testes)
+- [4.1 Classes de teste](#41-classes-de-teste)
+- [4.2 Cobertura de Testes](#42-cobertura-de-testes)
 
 # 1. Problema e Requisitos
 Implementem, em Java, uma simulação de criaturas saltitantes, conforme requisitos, a seguir:
@@ -97,31 +99,35 @@ Para executar o projeto, siga os passos abaixo:
 Os testes foram implementados utilizando o JUnit 5. Todos estão localizados no diretório `test/` e incluem:
 - Testes unitários
 - Testes de pré-condições e pós-condições
+- Testes de branchs
 - Testes de cobertura.
 
-Apenas as classes 'Duende', 'SimulationController' e 'TreeMapAdaptado' possuem teste. Testes nas classes da pasta `view/` não estão no escopo do projeto.
+# 4.1 Classes de teste
+Os testes estão organizados em três classes principais:
 
-#4.1 Testes na classe Duende:
-1. Testagem de construtor: Verifica se o objeto é criado corretamente com os valores padrão (ID, quantidade inicial de moedas e posição inicial).
+- `DuendeTest`:
+  - Criação e inicialização dos atributos.
+  - Movimentação dentro dos limites do horizonte.
+  - Operações de roubo e doação de moedas.
+  - Validação de pré-condições (como posições e valores inválidos).
+  - Testes de borda para posições e moedas.
 
-2. Teste de movimento dentro do horizonte: Confirma que o duende se move corretamente dentro dos limites estabelecidos (0 a 5 unidades de distância).
+- `TreeMapAdaptadoTest`:
+  - Inserção de duendes em posições distintas e tratamento de colisões de posição.
+  - Busca do duende mais próximo, considerando critérios de desempate por riqueza.
+  - Validação de pré-condições e pós-condições.
+  - Testes de exceção para entradas nulas ou inválidas.
+  - Testes de métodos auxiliares como verMaisRico.
 
-3.  Teste de movimento no limite superior: Assegura que o duende não ultrapassa o limite máximo do horizonte (10.0).
+- `SimulationControllerTest`:
+  - Inicialização da simulação com diferentes parâmetros, incluindo casos inválidos.
+  - Criação de duendes e inicialização do mapa.
+  - Execução dos métodos principais do controlador, incluindo movimentação, roubo, verificação de chegada e exibição dos resultados.
+  - Testes de integração com a interface gráfica (verificação da criação do painel e janela).
+  - Testes de métodos utilitários e de controle de fluxo.
+  - Cobertura de Testes
 
-4.  Teste de movimento no limite inferior: Garante que o duende não ultrapassa o limite mínimo do horizonte (0.0).
+# 4.2 Cobertura de Testes
+Com exceção da classe `Duende`, os testes atingem 100% de coverage. 
 
-5.  Teste de dar dinheiro: Verifica se o método giveCoins() retorna corretamente metade das moedas do duende e atualiza seu saldo.
-
-6.  Teste de roubo bem-sucedido: Confirma que um duende pode roubar metade das moedas de outro duende, com os valores sendo transferidos corretamente.
-
-7.  Teste de auto-furto: Valida que um duende não pode roubar a si mesmo, lançando uma exceção apropriada.
-
-8.  Teste de roubo com vítima nula: Verifica o tratamento de caso inválido quando se tenta roubar um duende nulo.
-
-9.  Teste de posição válida: Confirma que é possível definir uma posição dentro dos limites permitidos.
-
-10. Teste de posição inválida: Garante que o sistema rejeita posições abaixo do limite mínimo (0.0).
-
-11. Teste de definição de moedas: Verifica se o método setCoins() atualiza corretamente a quantidade de moedas do duende.
-
-Os testes acima garantem uma coverage de 90% (9/10). Os 10% faltantes estão em um if que não conseguimos testar de maneira eficiente por depender de um valor gerado aleatoriamente.
+No escopo de `Duende`, com 90% de coverage, existem algumas condições específicas que dependem da aleatoriedade do movimento dos duendes. Estas podem não ser totalmente cobertas em todas as execuções dos testes. Apesar disso, todos os caminhos críticos, validações e exceções são testados explicitamente.

@@ -128,6 +128,9 @@ Os testes estão organizados em três classes principais:
   - Cobertura de Testes
 
 # 4.2 Cobertura de Testes
-Com exceção da classe `Duende`, os testes atingem 100% de coverage. 
+A classe `Duende` atinge 90% de branch coverage, enquanto a `SimulationController` atinge 95% e a `TreeMapAdaptado`, 100%. 
 
 No escopo de `Duende`, com 90% de coverage, existem algumas condições específicas que dependem da aleatoriedade do movimento dos duendes. Estas podem não ser totalmente cobertas em todas as execuções dos testes. Apesar disso, todos os caminhos críticos, validações e exceções são testados explicitamente.
+
+Já no escopo de `SimulationController`, com 95% de coverage, existem condições problemáticas que o código garante que sejam tratadas previamente, e portanto, são impossíveis de darem falsas
+(no caso, percorrer uma lista de Duendes que seja vazia/null, mas o código garante que isso não aconteça, e portanto, é impossível de testar). O outro caso acontece na função `verificarChegada()`, que por algum motivo, a coverage alega 30 "true hits", mesmo com a existência de um teste que garante um caso para false hits (o teste `testVerificarChegadaFalso`).

@@ -72,21 +72,21 @@ class DuendeTest {
     void testAutoFurtoDeveFalhar() {
 
         Duende duende = new Duende(1);
-        long initialCoins = duende.getCoins();
 
-        duende.steal(duende);
+        assertThrows(IllegalArgumentException.class, () -> {
+            duende.steal(duende);
+        });
 
-        assertEquals(initialCoins, duende.getCoins());
     }
 
     @Test
     void testTentarRoubarNull() {
         Duende thief = new Duende(1);
-        long initialCoins = thief.getCoins();
 
-        thief.steal(null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            thief.steal(null);
+        });
 
-        assertEquals(initialCoins, thief.getCoins());
     }
 
     @Test

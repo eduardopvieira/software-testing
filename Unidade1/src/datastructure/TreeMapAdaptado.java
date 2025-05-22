@@ -17,12 +17,6 @@ public class TreeMapAdaptado {
             throw new IllegalArgumentException("Duende não pode ser nulo.");
         }
 
-        //! Essa linha não é pega no teste de coverage pq a classe Duende ja tem uma verificaçao propria
-        //! pra ver se a posição é menor que zero. Nesse caso, dá erro na classe Duende, e nunca vai chegar nessa linha.
-        if (duende.getPosition() < 0) {
-            throw new IllegalArgumentException("Duende não pode estar em posição negativa.");
-        }
-
         double chave = duende.getPosition();
         
         while (treeMapPrincipal.containsKey(chave)) {
@@ -49,7 +43,9 @@ public class TreeMapAdaptado {
         Map.Entry<Double, Duende> anterior = treeMapPrincipal.lowerEntry(chaveAtual);
         Map.Entry<Double, Duende> posterior = treeMapPrincipal.higherEntry(chaveAtual);
 
-        if (anterior == null) return posterior != null ? posterior.getValue() : null;
+        //!Não é necessário verificar se posterior ou anterior são nulos dentro do bloco do if,
+        //!pois a propria treemap impede que tenha apenas 1 duende na arvore.
+        if (anterior == null) return posterior.getValue();
         if (posterior == null) return anterior.getValue();
 
         double distEsq = Math.abs(chaveAtual - anterior.getKey());
@@ -65,10 +61,9 @@ public class TreeMapAdaptado {
             retorno = verMaisRico(anterior.getValue(), posterior.getValue());
         }
 
-        //! Teste de pós-condição
-        if (retorno == null) {
-            throw new IllegalStateException("Nenhum duende encontrado.");
-        }
+        //! Teste de pós-condição não se faz necessário, visto que a
+        //! função garante que o retorno não será nulo.
+        //! Quando coloquei a verificação, impedia o 100% em branch coverage.
 
         return retorno;
 

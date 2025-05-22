@@ -100,6 +100,7 @@ Os testes foram implementados utilizando o JUnit 5. Todos estão localizados no 
 - Testes unitários
 - Testes de pré-condições e pós-condições
 - Testes de branchs
+- Testes de cobertura.
 
 # 4.1 Classes de teste
 Os testes estão organizados em três classes principais:
@@ -127,4 +128,6 @@ Os testes estão organizados em três classes principais:
   - Cobertura de Testes
 
 # 4.2 Cobertura de Testes
-Os testes atingem 100% de coverage das classes de domínio e controle. No entanto, vale ressaltar que algumas condições específicas, especialmente aquelas que dependem da aleatoriedade do movimento dos duendes, podem não ser totalmente cobertas em todas as execuções dos testes. Apesar disso, todos os caminhos críticos, validações e exceções são testados explicitamente.
+Com exceção da classe `Duende`, os testes atingem 100% de coverage. 
+
+No escopo de `Duende`, com 90% de coverage, existem algumas condições específicas que dependem da aleatoriedade do movimento dos duendes. Estas podem não ser totalmente cobertas em todas as execuções dos testes. Apesar disso, todos os caminhos críticos, validações e exceções são testados explicitamente.

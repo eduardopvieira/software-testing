@@ -11,9 +11,11 @@
   - [2.2 Estrutura do Projeto](#22-estrutura-do-projeto)
   - [2.3 Paralelismo](#23-paralelismo)
 - [3. Execução do Projeto](#3-execução-do-projeto)
-  - [3.1 Setup](#31-setup)
-  - [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
-- [4. Configuração do ambiente de testes](#4-testes)
+- [3.1 Setup](#31-setup)
+- [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
+- [4. Testes](#4-testes)
+- [4.1 Classes de teste](#41-classes-de-teste)
+- [4.2 Cobertura de Testes](#42-cobertura-de-testes)
 
 # 1. Problema e Requisitos
 Implementem, em Java, uma simulação de criaturas saltitantes, conforme requisitos, a seguir:
@@ -98,3 +100,31 @@ Os testes foram implementados utilizando o JUnit 5. Todos estão localizados no 
 - Testes unitários
 - Testes de pré-condições e pós-condições
 - Testes de branchs
+
+# 4.1 Classes de teste
+Os testes estão organizados em três classes principais:
+
+- `DuendeTest`:
+  - Criação e inicialização dos atributos.
+  - Movimentação dentro dos limites do horizonte.
+  - Operações de roubo e doação de moedas.
+  - Validação de pré-condições (como posições e valores inválidos).
+  - Testes de borda para posições e moedas.
+
+- `TreeMapAdaptadoTest`:
+  - Inserção de duendes em posições distintas e tratamento de colisões de posição.
+  - Busca do duende mais próximo, considerando critérios de desempate por riqueza.
+  - Validação de pré-condições e pós-condições.
+  - Testes de exceção para entradas nulas ou inválidas.
+  - Testes de métodos auxiliares como verMaisRico.
+
+- `SimulationControllerTest`:
+  - Inicialização da simulação com diferentes parâmetros, incluindo casos inválidos.
+  - Criação de duendes e inicialização do mapa.
+  - Execução dos métodos principais do controlador, incluindo movimentação, roubo, verificação de chegada e exibição dos resultados.
+  - Testes de integração com a interface gráfica (verificação da criação do painel e janela).
+  - Testes de métodos utilitários e de controle de fluxo.
+  - Cobertura de Testes
+
+# 4.2 Cobertura de Testes
+Os testes atingem 100% de coverage das classes de domínio e controle. No entanto, vale ressaltar que algumas condições específicas, especialmente aquelas que dependem da aleatoriedade do movimento dos duendes, podem não ser totalmente cobertas em todas as execuções dos testes. Apesar disso, todos os caminhos críticos, validações e exceções são testados explicitamente.

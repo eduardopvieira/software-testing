@@ -116,14 +116,10 @@ public class SimulationController {
                     moverERoubar(duende, tma, panel);
 
                     pausaVisualizacao();
-
-                }
-
-                if (alguemChegou) {
-                    exibirResultadosFinais(duendes);
-                    break;
                 }
             }
+
+            exibirResultadosFinais(duendes);
         }).start();
     }
 

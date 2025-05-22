@@ -3,66 +3,63 @@ package model;
 import java.util.Random;
 
 public class Duende {
-
-    public static double posAtual = 0.0;
-
     private int id;
-
-    private long money;
-
+    private long coins;
     private double position;
 
-    public Duende (int id) {
+    public Duende(int id) {
         this.id = id;
-        this.money = 1000000L;
-        this.position = posAtual++;
+        this.coins = 1000000L;
+        this.position = id * 0.1;
     }
 
-    public void move() {
+    public void move(double maxHorizon) {
         Random random = new Random();
         double posAntiga = getPosition();
-        this.setPosition(random.nextDouble(3) - 1); // -1, 0, or 1
+        double movimento = random.nextDouble() * 2 - 1; // -1 a 1
+
+        double newPos = posAntiga + movimento * this.coins;
+
+        //! O teste desse trecho depende de aleatoriedade, ja que o valor gerado é random.
+        if (newPos > maxHorizon) {
+            newPos = maxHorizon;
+        } else if (newPos < 0) {
+            newPos = 0;
+        }
+
+        this.setPosition(newPos);
+        
         System.out.println("Duende " + this.getId() + " saiu de " + posAntiga + " para " + this.getPosition());
     }
 
-    private Long giveMoney() {
-        Long perdido = this.money/2;
-        this.money = this.money - perdido;
-        System.out.println("O Duende " + id + " perdeu " + perdido + " dinheiros. Coitado.");
+    public Long giveCoins() {
+        Long perdido = this.coins / 2;
+        this.coins = this.coins - perdido;
+        System.out.println("O Duende " + id + " perdeu " + perdido + " moedas. Coitado.");
         return perdido;
     }
 
     public void steal(Duende victim) {
-        Long roubado = victim.giveMoney();
-        this.money = this.money + roubado;
-        System.out.println("O Duende " + id + " roubou o Duende " + victim.getId() + " com sucesso.");
+        if (victim != null && victim != this) {
+            Long roubado = victim.giveCoins();
+            this.coins = this.coins + roubado;
+            System.out.println("O Duende " + id + " roubou o Duende " + victim.getId() + " com sucesso.");
+        } else {
+            throw new IllegalArgumentException("O duende não pode ser nulo ou roubar a si mesmo.");
+        }
     }
 
-
-    //Getters e Setters
-
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Long getMoney() {
-        return money;
-    }
-
-    public void setMoney(Long money) {
-        this.money = money;
-    }
-
-    public double getPosition() {
-        return position;
-    }
-
+    // Getters e Setters
+    public int getId() { return id; }
+    public Long getCoins() { return coins; }
+    public double getPosition() { return position; }
     public void setPosition(double position) {
-        this.position = position;
+        if (position < 0) {
+            throw new IllegalArgumentException("Posição não pode ser negativa.");
+        }
+        this.position = position; }
+
+    public void setCoins(Long i) {
+        this.coins = i;
     }
 }

@@ -1,4 +1,4 @@
-package datastructure;
+package model.datastructure;
 
 import java.util.Map;
 import java.util.Objects;

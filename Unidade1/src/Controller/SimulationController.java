@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import datastructure.TreeMapAdaptado;
+import model.datastructure.TreeMapAdaptado;
 import model.Duende;
 import view.SimulationView;
 

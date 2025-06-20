@@ -1,8 +1,13 @@
 package model;
 
+import model.interfaces.EntityOnHorizon;
+
 import java.util.Random;
 
-public class Duende {
+public class Duende implements EntityOnHorizon {
+
+    private static final Random random = new Random();
+
     private int id;
     private long coins;
     private double position;
@@ -14,13 +19,10 @@ public class Duende {
     }
 
     public void move(double maxHorizon) {
-        Random random = new Random();
         double posAntiga = getPosition();
-        double movimento = random.nextDouble() * 2 - 1; // -1 a 1
-
+        double movimento = random.nextDouble() * 2 - 1;
         double newPos = posAntiga + movimento * this.coins;
 
-        //! O teste desse trecho depende de aleatoriedade, ja que o valor gerado é random.
         if (newPos > maxHorizon) {
             newPos = maxHorizon;
         } else if (newPos < 0) {
@@ -28,38 +30,62 @@ public class Duende {
         }
 
         this.setPosition(newPos);
-        
-        System.out.println("Duende " + this.getId() + " saiu de " + posAntiga + " para " + this.getPosition());
+
+        System.out.println("Duende " + this.getId() + " moveu-se para " + this.getPosition());
     }
 
-    public Long giveCoins() {
-        Long perdido = this.coins / 2;
-        this.coins = this.coins - perdido;
+    @Override
+    public long beingStealed() {
+        long perdido = this.coins / 2;
+        this.coins -= perdido;
         System.out.println("O Duende " + id + " perdeu " + perdido + " moedas. Coitado.");
         return perdido;
     }
 
-    public void steal(Duende victim) {
+    @Override
+    public void steal(EntityOnHorizon victim) {
         if (victim != null && victim != this) {
-            Long roubado = victim.giveCoins();
-            this.coins = this.coins + roubado;
-            System.out.println("O Duende " + id + " roubou o Duende " + victim.getId() + " com sucesso.");
+            long stolenCoins = victim.beingStealed();
+            this.addCoins(stolenCoins);
+            System.out.println("Duende " + this.getId() + " roubou " + stolenCoins + " moedas de Duende/Cluster " + victim.getId());
         } else {
-            throw new IllegalArgumentException("O duende não pode ser nulo ou roubar a si mesmo.");
+            throw new IllegalArgumentException("A entidade não pode ser nula ou roubar a si mesma.");
         }
     }
 
-    // Getters e Setters
-    public int getId() { return id; }
-    public Long getCoins() { return coins; }
-    public double getPosition() { return position; }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public long getCoins() {
+        return coins;
+    }
+
+    @Override
+    public double getPosition() {
+        return position;
+    }
+
+    @Override
     public void setPosition(double position) {
+        // A validação no método move() já previne posições negativas. Essa ta aqui só pra preencher tabela
         if (position < 0) {
             throw new IllegalArgumentException("Posição não pode ser negativa.");
         }
-        this.position = position; }
+        this.position = position;
+    }
 
-    public void setCoins(Long i) {
+    @Override
+    public void addCoins(long amount) {
+        this.coins += amount;
+    }
+
+
+    //metodo pra testes (se necessario)
+    public void setCoins(long i) {
         this.coins = i;
     }
 }

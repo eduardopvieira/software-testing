@@ -4,44 +4,45 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
-
-import model.Duende;
+import model.interfaces.EntityOnHorizon;
 
 public class TreeMapAdaptado {
-    public TreeMap<Double, Duende> treeMapPrincipal = new TreeMap<>();
+    public TreeMap<Double, EntityOnHorizon> treeMapPrincipal = new TreeMap<>();
 
-    public void addDuende(Duende duende) {
+    public void addEntity(EntityOnHorizon entity) {
 
         //!Testes de pré-condição (não tem pós-condição pq a função é void)
-        if (duende == null) {
+        if (entity == null) {
             throw new IllegalArgumentException("Duende não pode ser nulo.");
         }
 
-        double chave = duende.getPosition();
-        
+        double chave = entity.getPosition();
+
+        //TODO: ARRUMAR ISSO AQUI
         while (treeMapPrincipal.containsKey(chave)) {
             chave += 0.1;
             System.out.println("Conflito de duendes. Duende " + duende.getId() + " foi movido para " + chave);
         }
-        duende.setPosition(chave);
-        treeMapPrincipal.put(duende.getPosition(), duende);
+
+        entity.setPosition(chave);
+        treeMapPrincipal.put(entity.getPosition(), entity);
     }
 
-    public Duende findNearestDuende(Duende atual) {
+    public EntityOnHorizon findNearestEntity(EntityOnHorizon atual) {
 
         //!Teste de pré-condição
         if (atual == null) {
-            throw new IllegalArgumentException("Duende não pode ser nulo.");
+            throw new IllegalArgumentException("Entidade não pode ser nula.");
         }
 
         if (treeMapPrincipal.isEmpty() || treeMapPrincipal.size() == 1) {
-            throw new IllegalStateException("Não há duendes o suficiente na árvore.");
+            throw new IllegalStateException("Não há entidades o suficiente na árvore.");
         }
 
 
         double chaveAtual = atual.getPosition();
-        Map.Entry<Double, Duende> anterior = treeMapPrincipal.lowerEntry(chaveAtual);
-        Map.Entry<Double, Duende> posterior = treeMapPrincipal.higherEntry(chaveAtual);
+        Map.Entry<Double, EntityOnHorizon> anterior = treeMapPrincipal.lowerEntry(chaveAtual);
+        Map.Entry<Double, EntityOnHorizon> posterior = treeMapPrincipal.higherEntry(chaveAtual);
 
         //!Não é necessário verificar se posterior ou anterior são nulos dentro do bloco do if,
         //!pois a propria treemap impede que tenha apenas 1 duende na arvore.
@@ -51,7 +52,7 @@ public class TreeMapAdaptado {
         double distEsq = Math.abs(chaveAtual - anterior.getKey());
         double distDir = Math.abs(chaveAtual - posterior.getKey());
 
-        Duende retorno = null;
+        EntityOnHorizon retorno = null;
 
         if (distEsq < distDir) {
             retorno = anterior.getValue();
@@ -69,7 +70,7 @@ public class TreeMapAdaptado {
 
     }
 
-    public Duende verMaisRico(Duende A, Duende B) {
+    public EntityOnHorizon verMaisRico(EntityOnHorizon A, EntityOnHorizon B) {
 
         //!Teste de pré-condição
         if (A == null || B == null) {

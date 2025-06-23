@@ -3,8 +3,11 @@ package model;
 import model.interfaces.EntityOnHorizon;
 
 import java.util.List;
+import java.util.Random;
 
 public class Cluster implements EntityOnHorizon {
+    Random random = new Random();
+
     List<Duende> duendes;
     long coins;
     double position;
@@ -17,10 +20,34 @@ public class Cluster implements EntityOnHorizon {
         this.quantityDuendes = 2;
     }
 
-    public void addToCluster(Duende duende) {
-        duendes.add(duende);
-        coins += duende.getCoins();
-        quantityDuendes++;
+    public void addToCluster(EntityOnHorizon entidade) {
+        if (entidade instanceof Duende) {
+            this.duendes.add((Duende) entidade);
+            quantityDuendes++;
+            coins += entidade.getCoins();
+        } else if (entidade instanceof Cluster) {
+            Cluster cluster = (Cluster) entidade;
+            quantityDuendes += cluster.getQuantityDuendes();
+            duendes.addAll(cluster.getDuendes());
+            coins += cluster.getCoins();
+        } else {
+            throw new IllegalArgumentException("A entidade deve ser um Duende ou um Cluster.");
+        }
+    }
+
+    public void move(double maxHorizon) {
+        double posAntiga = getPosition();
+        double movimento = random.nextDouble() * 2 - 1;
+        double newPos = posAntiga + movimento * this.coins;
+
+        if (newPos > maxHorizon) {
+            newPos = maxHorizon;
+        } else if (newPos < 0) {
+            newPos = 0;
+        }
+
+        this.setPosition(newPos);
+        System.out.println("Cluster " + this.getId() + " moveu-se para " + this.getPosition());
     }
 
 

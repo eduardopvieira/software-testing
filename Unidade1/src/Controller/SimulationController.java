@@ -12,12 +12,11 @@ import model.Duende;
 import model.interfaces.EntityOnHorizon;
 import view.SimulationView;
 
-
 public class SimulationController {
     private static long maxCoins;
     private static double maxHorizon;
 
-    public static void iniciarSimulacao(int numDuendes, double maxHorizon, long maxCoins) {
+    public void iniciarSimulacao(int numDuendes, double maxHorizon, long maxCoins) {
         if (numDuendes <= 1 || numDuendes > 20) {
             throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
         }
@@ -36,7 +35,6 @@ public class SimulationController {
 
         List<Duende> duendes = criarDuendes(numDuendes);
         TreeMapAdaptado tma = inicializarTreeMap(duendes);
-        // A view é criada com a lista inicial de entidades do mapa
         SimulationView panel = criarEExibirJanela(new ArrayList<>(tma.treeMapPrincipal.values()));
         executarLogicaSimulacao(duendes, tma, panel);
     }
@@ -57,8 +55,7 @@ public class SimulationController {
             throw new IllegalArgumentException("A lista de duendes não pode ser nula ou vazia.");
         }
         TreeMapAdaptado tma = new TreeMapAdaptado();
-        // Assume-se que TreeMapAdaptado tem um método para adição inicial sem colisões
-        duendes.forEach(tma::addEntity);
+        duendes.forEach(tma::addDuendeInicial);
         return tma;
     }
 
@@ -73,7 +70,7 @@ public class SimulationController {
         return panel;
     }
 
-    public static void executarLogicaSimulacao(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
+    public void executarLogicaSimulacao(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
         new Thread(() -> {
             int iteracao = 0;
             boolean jogoAcabou = false;
@@ -82,18 +79,12 @@ public class SimulationController {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
-                // --- FASE 1: MOVIMENTO E CLUSTERIZAÇÃO ---
                 for (Duende duende : duendes) {
                     if (tma.treeMapPrincipal.containsValue(duende)) {
-                        processarMovimentoECluster(duende, tma);
+                        processarTurno(duende, tma);
                     }
                 }
 
-                // --- FASE 2: ROUBO ---
-                // Após todos se moverem, os clusters realizam suas ações de roubo.
-                processarRoubos(tma);
-
-                // --- FASE 3: ATUALIZAÇÃO DA VIEW E VERIFICAÇÃO DE TÉRMINO ---
                 panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
                 panel.repaint();
 
@@ -105,55 +96,78 @@ public class SimulationController {
         }).start();
     }
 
-    public static void processarMovimentoECluster(Duende duende, TreeMapAdaptado tma) {
-        double posAntiga = duende.getPosition();
+    public void processarTurno(EntityOnHorizon entidade, TreeMapAdaptado tma) {
+        // --- PARTE 1: MOVIMENTO ---
+        EntityOnHorizon ator = logicaMovimento(entidade, tma);
+
+        // --- PARTE 2: ROUBO ---
+        logicaRoubo(ator, tma);
+    }
+
+    public void logicaRoubo(EntityOnHorizon entidade, TreeMapAdaptado tma) {
+        EntityOnHorizon vitima = tma.findNearestEntidade(entidade);
+        if (vitima != null && vitima != entidade) {
+            entidade.steal(vitima);
+            System.out.println(entidade.getId() + " agora possui " + entidade.getCoins() + " moedas.");
+        } else {
+            System.out.println("Nenhum vizinho para roubar.");
+        }
+    }
+
+    public EntityOnHorizon logicaMovimento(EntityOnHorizon entidade, TreeMapAdaptado tma) {
+        double posAntiga = entidade.getPosition();
         tma.treeMapPrincipal.remove(posAntiga);
 
-        duende.move(maxHorizon);
-        double novaPosicao = duende.getPosition();
+        entidade.move(maxHorizon);
+        double novaPosicao = entidade.getPosition();
 
         EntityOnHorizon ocupante = tma.treeMapPrincipal.get(novaPosicao);
 
         if (ocupante == null) {
-            tma.treeMapPrincipal.put(novaPosicao, duende);
+            // Cenário 0: Posição livre. A entidade simplesmente se move.
+            tma.treeMapPrincipal.put(novaPosicao, entidade);
+            return entidade; // <<< CORREÇÃO: Retorna a própria entidade que se moveu.
         } else {
-            System.out.println("COLISÃO na posição " + novaPosicao + "!");
+            // Cenário de COLISÃO!
+            System.out.println("COLISÃO em " + novaPosicao + "! " + TreeMapAdaptado.getNomeEntidade(entidade) + " vs " + TreeMapAdaptado.getNomeEntidade(ocupante));
             tma.treeMapPrincipal.remove(novaPosicao);
 
-            Cluster clusterResultante;
-            if (ocupante instanceof Duende) {
-                System.out.println("Duende " + duende.getId() + " colidiu com Duende " + ((Duende) ocupante).getId());
-                clusterResultante = new Cluster(duende, (Duende) ocupante);
-                System.out.println("Novo cluster formado com " + clusterResultante.getCoins() + " moedas.");
-            } else { // Ocupante é um Cluster
-                System.out.println("Duende " + duende.getId() + " colidiu com um cluster.");
-                clusterResultante = (Cluster) ocupante;
-                clusterResultante.addToCluster(duende);
-                System.out.println("Cluster agora tem " + clusterResultante.getQuantityDuendes() + " duendes e " + clusterResultante.getCoins() + " moedas.");
-            }
+            if (entidade instanceof Duende && ocupante instanceof Duende) {
+                // Cenário 1: Duende colide com Duende
+                Cluster novoCluster = new Cluster((Duende) entidade, (Duende) ocupante);
+                tma.treeMapPrincipal.put(novaPosicao, novoCluster);
+                System.out.println("Resultado: Novo cluster formado.");
+                return novoCluster; // <<< CORREÇÃO: Retorna o NOVO cluster.
 
-            tma.treeMapPrincipal.put(clusterResultante.getPosition(), clusterResultante);
-        }
-    }
+            } else if (entidade instanceof Cluster && ocupante instanceof Cluster) {
+                // Cenário 2: Cluster colide com Cluster
+                Cluster clusterBase = (Cluster) entidade;
+                clusterBase.addToCluster(ocupante);
+                tma.treeMapPrincipal.put(novaPosicao, clusterBase);
+                System.out.println("Resultado: Clusters se fundiram.");
+                return clusterBase; // <<< CORREÇÃO: Retorna o cluster que absorveu o outro.
 
-    public static void processarRoubos(TreeMapAdaptado tma) {
-        List<EntityOnHorizon> entidadesAtivas = new ArrayList<>(tma.treeMapPrincipal.values());
-        for (EntityOnHorizon entidade : entidadesAtivas) {
-            if (entidade instanceof Cluster) {
-                Cluster clusterAtacante = (Cluster) entidade;
-                EntityOnHorizon vitima = tma.findNearestEntity(clusterAtacante);
+            } else {
+                // Cenário 3: Duende colide com Cluster (em qualquer ordem)
+                Cluster clusterExistente;
+                EntityOnHorizon outro;
 
-                if (vitima != null) {
-                    System.out.println("Cluster na posição " + clusterAtacante.getPosition() + " vai roubar seu vizinho.");
-                    long moedasRoubadas = vitima.beingStealed();
-                    clusterAtacante.addCoins(moedasRoubadas);
-                    System.out.println("Cluster agora possui " + clusterAtacante.getCoins() + " moedas.");
+                if (entidade instanceof Cluster) {
+                    clusterExistente = (Cluster) entidade;
+                    outro = ocupante;
+                } else { // Ocupante deve ser o Cluster
+                    clusterExistente = (Cluster) ocupante;
+                    outro = entidade;
                 }
+                clusterExistente.addToCluster(outro);
+                tma.treeMapPrincipal.put(novaPosicao, clusterExistente);
+                System.out.println("Resultado: Duende foi adicionado ao cluster.");
+                return clusterExistente; // <<< CORREÇÃO: Retorna o cluster atualizado.
             }
         }
     }
 
-    public static boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
+    public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
         for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
             if (entidade.getCoins() >= maxCoins) {
                 System.out.println("FIM DE JOGO! Uma entidade atingiu " + entidade.getCoins() + " moedas.");
@@ -167,9 +181,8 @@ public class SimulationController {
         return false;
     }
 
-    public static void exibirResultadosFinais(List<EntityOnHorizon> entidades) {
+    public void exibirResultadosFinais(List<EntityOnHorizon> entidades) {
         System.out.println("\nResultado Final:");
-
         entidades.sort((e1, e2) -> Long.compare(e2.getCoins(), e1.getCoins()));
 
         StringBuilder resultados = new StringBuilder("Fim da Simulação!\n\nResultado Final:\n");

@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 
-import model.interfaces.EntityOnHorizon;
-import model.Duende;
-import model.Cluster;
+import model.domain.interfaces.EntityOnHorizon;
+import model.domain.interfaces.Duende;
+import model.domain.interfaces.Cluster;
 
 public class TreeMapAdaptado {
 

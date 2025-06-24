@@ -1,4 +1,4 @@
-package model.interfaces;
+package model.domain.interfaces;
 
 public interface EntityOnHorizon {
     double getPosition();

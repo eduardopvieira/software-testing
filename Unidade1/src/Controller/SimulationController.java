@@ -7,9 +7,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import datastructure.TreeMapAdaptado;
-import model.Cluster;
-import model.Duende;
-import model.interfaces.EntityOnHorizon;
+import model.domain.interfaces.Cluster;
+import model.domain.interfaces.Duende;
+import model.domain.interfaces.EntityOnHorizon;
 import view.SimulationView;
 
 public class SimulationController {

@@ -6,9 +6,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import datastructure.TreeMapAdaptado;
-import model.domain.interfaces.Cluster;
-import model.domain.interfaces.Duende;
+import model.domain.datastructure.TreeMapAdaptado;
+import model.domain.Cluster;
+import model.domain.Duende;
 import model.domain.interfaces.EntityOnHorizon;
 import view.SimulationView;
 

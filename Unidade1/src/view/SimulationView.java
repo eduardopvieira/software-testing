@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.imageio.ImageIO;
-import model.domain.interfaces.Cluster;
-import model.domain.interfaces.Duende;
+import model.domain.Cluster;
+import model.domain.Duende;
 import model.domain.interfaces.EntityOnHorizon;
 
 public class SimulationView extends JPanel {

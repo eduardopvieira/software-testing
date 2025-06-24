@@ -1,6 +1,5 @@
-package model;
+package model.domain.interfaces;
 
-import model.interfaces.EntityOnHorizon;
 
 import java.util.Random;
 

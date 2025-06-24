@@ -1,20 +1,19 @@
-package model;
+package model.domain.interfaces;
 
-import model.interfaces.EntityOnHorizon;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class Cluster implements EntityOnHorizon {
     Random random = new Random();
 
-    List<Duende> duendes;
+    ArrayList<Duende> duendes;
     long coins;
     double position;
     int quantityDuendes;
 
     public Cluster(Duende duende1, Duende duende2) {
-        this.duendes = List.of(duende1, duende2);
+        this.duendes = new ArrayList<>(List.of(duende1, duende2));
         this.coins = duende1.getCoins() + duende2.getCoins();
         this.position = duende1.getPosition();
         this.quantityDuendes = 2;

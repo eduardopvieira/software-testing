@@ -1,4 +1,4 @@
-import model.Duende;
+import model.domain.interfaces.Duende;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

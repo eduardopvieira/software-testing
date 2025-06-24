@@ -141,7 +141,8 @@ public class MenuView {
             frame.remove(inputPanel);
             frame.dispose();
 
-            SimulationController.iniciarSimulacao(numDuendes, maxHorizon, maxCoins);
+            SimulationController controller = new SimulationController();
+            controller.iniciarSimulacao(numDuendes, maxHorizon, maxCoins);
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame,

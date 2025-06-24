@@ -2,22 +2,21 @@ package Controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import datastructure.TreeMapAdaptado;
-import model.Duende;
+import model.domain.interfaces.Cluster;
+import model.domain.interfaces.Duende;
+import model.domain.interfaces.EntityOnHorizon;
 import view.SimulationView;
 
 public class SimulationController {
     private static long maxCoins;
     private static double maxHorizon;
 
-    public static void iniciarSimulacao(int numDuendes, double maxHorizon, long maxCoins) {
-
-        //!Testes de pré-condicao
+    public void iniciarSimulacao(int numDuendes, double maxHorizon, long maxCoins) {
         if (numDuendes <= 1 || numDuendes > 20) {
             throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
         }
@@ -31,170 +30,189 @@ public class SimulationController {
             throw new IllegalArgumentException("O ponto de parada não pode ser maior que o valor total de moedas na simulação.");
         }
 
-
         SimulationController.maxCoins = maxCoins;
         SimulationController.maxHorizon = maxHorizon;
 
         List<Duende> duendes = criarDuendes(numDuendes);
         TreeMapAdaptado tma = inicializarTreeMap(duendes);
-        SimulationView panel = criarEExibirJanela(duendes);
+        SimulationView panel = criarEExibirJanela(new ArrayList<>(tma.treeMapPrincipal.values()));
         executarLogicaSimulacao(duendes, tma, panel);
     }
 
     public static List<Duende> criarDuendes(int quantidade) {
-        //! Teste de pré-condição
         if (quantidade <= 1 || quantidade > 20) {
             throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
         }
-
         List<Duende> duendes = new ArrayList<>();
         for (int i = 0; i < quantidade; i++) {
             duendes.add(new Duende(i));
         }
-
-        //! Teste de pós-condição impede 100% de coverage, visto
-        //! que a propria Collection do java me garante que
-        //! é impossível dar miss na condição comentada.
-
-        //if (duendes.size() == quantidade) {
         return duendes;
-        //}
     }
 
     public static TreeMapAdaptado inicializarTreeMap(List<Duende> duendes) {
-        //! Teste de pré-condição
         if (duendes == null || duendes.isEmpty()) {
             throw new IllegalArgumentException("A lista de duendes não pode ser nula ou vazia.");
         }
-
         TreeMapAdaptado tma = new TreeMapAdaptado();
-        duendes.forEach(tma::addDuende);
-
-        //! Teste de pós-condição impede 100% de coverage, visto
-        //! que a propria Collection do java me garante que
-        //! é impossível dar miss na condição comentada.
-
-        //if (!tma.treeMapPrincipal.isEmpty()) {
-            return tma;
-        //}
+        duendes.forEach(tma::addDuendeInicial);
+        return tma;
     }
 
-    public static SimulationView criarEExibirJanela(List<Duende> duendes) {
-
-        //! Teste de pré-condição
-        if (duendes == null || duendes.isEmpty()) {
-            throw new IllegalArgumentException("A lista de duendes não pode ser nula ou vazia.");
-        }
-
-        SimulationView panel = new SimulationView(duendes);
-        JFrame simulationFrame = new JFrame("Simulação de Duendes");
+    public static SimulationView criarEExibirJanela(List<EntityOnHorizon> entidades) {
+        SimulationView panel = new SimulationView(entidades);
+        JFrame simulationFrame = new JFrame("Simulação de Duendes & Clusters");
         simulationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         simulationFrame.add(panel);
         simulationFrame.pack();
         simulationFrame.setLocationRelativeTo(null);
         simulationFrame.setVisible(true);
-
-        //! Não é necessario teste de pós-condição
         return panel;
     }
 
-    public static void executarLogicaSimulacao(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
-        //! Verificação dos parametros já é feita na função iniciarSimulacao() dessa mesma classe
-
+    public void executarLogicaSimulacao(List<Duende> duendes, TreeMapAdaptado tma, SimulationView panel) {
         new Thread(() -> {
             int iteracao = 0;
-            boolean alguemChegou = false;
+            boolean jogoAcabou = false;
 
-            while (!alguemChegou) {
+            while (!jogoAcabou) {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
-
-
                 for (Duende duende : duendes) {
-
-                    //! Não dá pra testar essa condição de forma eficaz,
-                    if (verificarChegada(duende, SimulationController.maxCoins)) {
-                        alguemChegou = true;
-
-                        break;
+                    if (tma.treeMapPrincipal.containsValue(duende)) {
+                        processarTurno(duende, tma);
                     }
-
-                    moverERoubar(duende, tma, panel);
-
-                    pausaVisualizacao();
                 }
+
+                panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
+                panel.repaint();
+
+                jogoAcabou = verificarCondicaoDeTermino(tma);
+                pausaVisualizacao();
             }
 
-            exibirResultadosFinais(duendes);
+            exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
         }).start();
     }
 
+    public void processarTurno(EntityOnHorizon entidade, TreeMapAdaptado tma) {
+        // --- PARTE 1: MOVIMENTO ---
+        EntityOnHorizon ator = logicaMovimento(entidade, tma);
 
-    public static void moverERoubar(Duende duende, TreeMapAdaptado tma, SimulationView panel) {
-        //! Teste de pré-condição
-        if (duende == null || tma == null || panel == null) {
-            throw new IllegalArgumentException("Parâmetros não podem ser nulos.");
-        }
-
-        tma.treeMapPrincipal.remove(duende.getPosition());
-        duende.move(maxHorizon);
-        tma.addDuende(duende);
-
-        Duende vitima = tma.findNearestDuende(duende);
-        duende.steal(vitima);
-
-        panel.repaint();
+        // --- PARTE 2: ROUBO ---
+        logicaRoubo(ator, tma);
     }
 
-    public static boolean verificarChegada(Duende duende, Long maxCoins) {
-
-        //! Teste de pré-condição
-        if (duende == null) {
-            throw new IllegalArgumentException("Duende não pode ser nulo.");
+    public void logicaRoubo(EntityOnHorizon entidade, TreeMapAdaptado tma) {
+        EntityOnHorizon vitima = tma.findNearestEntidade(entidade);
+        if (vitima != null && vitima != entidade) {
+            entidade.steal(vitima);
+            System.out.println(entidade.getId() + " agora possui " + entidade.getCoins() + " moedas.");
+        } else {
+            System.out.println("Nenhum vizinho para roubar.");
         }
+    }
 
-        if (duende.getCoins() >= maxCoins) {
-            System.out.println("Duende " + duende.getId() + " atingiu " + duende.getCoins() + 
-                            " moedas (limite: " + maxCoins + ")");
-            return true;
+    public EntityOnHorizon logicaMovimento(EntityOnHorizon entidade, TreeMapAdaptado tma) {
+        double posAntiga = entidade.getPosition();
+        tma.treeMapPrincipal.remove(posAntiga);
 
-        } else if (duende.getPosition() >= maxHorizon) {
-            System.out.println("Duende " + duende.getId() + " atingiu o horizonte máximo (" + maxHorizon + ")");
-            return true;
+        entidade.move(maxHorizon);
+        double novaPosicao = entidade.getPosition();
+
+        EntityOnHorizon ocupante = tma.treeMapPrincipal.get(novaPosicao);
+
+        if (ocupante == null) {
+            // Cenário 0: Posição livre. A entidade simplesmente se move.
+            tma.treeMapPrincipal.put(novaPosicao, entidade);
+            return entidade; // <<< CORREÇÃO: Retorna a própria entidade que se moveu.
+        } else {
+            // Cenário de COLISÃO!
+            System.out.println("COLISÃO em " + novaPosicao + "! " + TreeMapAdaptado.getNomeEntidade(entidade) + " vs " + TreeMapAdaptado.getNomeEntidade(ocupante));
+            tma.treeMapPrincipal.remove(novaPosicao);
+
+            if (entidade instanceof Duende && ocupante instanceof Duende) {
+                // Cenário 1: Duende colide com Duende
+                Cluster novoCluster = new Cluster((Duende) entidade, (Duende) ocupante);
+                tma.treeMapPrincipal.put(novaPosicao, novoCluster);
+                System.out.println("Resultado: Novo cluster formado.");
+                return novoCluster; // <<< CORREÇÃO: Retorna o NOVO cluster.
+
+            } else if (entidade instanceof Cluster && ocupante instanceof Cluster) {
+                // Cenário 2: Cluster colide com Cluster
+                Cluster clusterBase = (Cluster) entidade;
+                clusterBase.addToCluster(ocupante);
+                tma.treeMapPrincipal.put(novaPosicao, clusterBase);
+                System.out.println("Resultado: Clusters se fundiram.");
+                return clusterBase; // <<< CORREÇÃO: Retorna o cluster que absorveu o outro.
+
+            } else {
+                // Cenário 3: Duende colide com Cluster (em qualquer ordem)
+                Cluster clusterExistente;
+                EntityOnHorizon outro;
+
+                if (entidade instanceof Cluster) {
+                    clusterExistente = (Cluster) entidade;
+                    outro = ocupante;
+                } else { // Ocupante deve ser o Cluster
+                    clusterExistente = (Cluster) ocupante;
+                    outro = entidade;
+                }
+                clusterExistente.addToCluster(outro);
+                tma.treeMapPrincipal.put(novaPosicao, clusterExistente);
+                System.out.println("Resultado: Duende foi adicionado ao cluster.");
+                return clusterExistente; // <<< CORREÇÃO: Retorna o cluster atualizado.
+            }
+        }
+    }
+
+    public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
+        for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
+            if (entidade.getCoins() >= maxCoins) {
+                System.out.println("FIM DE JOGO! Uma entidade atingiu " + entidade.getCoins() + " moedas.");
+                return true;
+            }
+            if (entidade.getPosition() >= maxHorizon) {
+                System.out.println("FIM DE JOGO! Uma entidade atingiu o horizonte máximo: " + entidade.getPosition());
+                return true;
+            }
         }
         return false;
+    }
+
+    public void exibirResultadosFinais(List<EntityOnHorizon> entidades) {
+        System.out.println("\nResultado Final:");
+        entidades.sort((e1, e2) -> Long.compare(e2.getCoins(), e1.getCoins()));
+
+        StringBuilder resultados = new StringBuilder("Fim da Simulação!\n\nResultado Final:\n");
+        for (EntityOnHorizon entidade : entidades) {
+            String linha;
+            if (entidade instanceof Duende) {
+                Duende d = (Duende) entidade;
+                linha = String.format("Duende %d: %d Moedas (Pos: %.1f)\n", d.getId(), d.getCoins(), d.getPosition());
+            } else {
+                Cluster c = (Cluster) entidade;
+                linha = String.format("Cluster c/ %d duendes: %d Moedas (Pos: %.1f)\n", c.getQuantityDuendes(), c.getCoins(), c.getPosition());
+            }
+            System.out.print(linha);
+            resultados.append(linha);
+        }
+
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
+                resultados.toString(),
+                "Fim da Simulação",
+                JOptionPane.INFORMATION_MESSAGE));
     }
 
     public static void pausaVisualizacao() {
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         }
     }
-
-    public static void exibirResultadosFinais(List<Duende> duendes) {
-        System.out.println("\nResultado Final:");
-
-        List<Duende> sorted = new ArrayList<>(duendes);
-        sorted.sort((d1, d2) -> Double.compare(d2.getCoins(), d1.getCoins()));
-
-        sorted.forEach(d -> System.out.println("Duende " + d.getId() + ": " + d.getCoins() + " Moedas"));
-
-        SwingUtilities.invokeLater(() -> {
-            StringBuilder resultados = new StringBuilder("Resultado Final:\n");
-            sorted.forEach(d -> resultados.append("Duende ").append(d.getId())
-                    .append(": ").append(d.getCoins())
-                    .append(" Moedas\n"));
-
-            JOptionPane.showMessageDialog(null,
-                    resultados.toString(),
-                    "Fim da Simulação",
-                    JOptionPane.INFORMATION_MESSAGE);
-        });
-    }
-
 
     public static double getMaxHorizon() {
         return maxHorizon;
@@ -203,5 +221,4 @@ public class SimulationController {
     public static void setMaxHorizon(double maxHorizon) {
         SimulationController.maxHorizon = maxHorizon;
     }
-
 }

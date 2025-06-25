@@ -1,4 +1,6 @@
-package model.domain.interfaces;
+package model.domain;
+
+import model.domain.interfaces.EntityOnHorizon;
 
 import java.util.ArrayList;
 import java.util.List;

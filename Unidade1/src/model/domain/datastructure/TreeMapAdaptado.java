@@ -1,12 +1,12 @@
-package datastructure;
+package model.domain.datastructure;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 
-import model.domain.interfaces.EntityOnHorizon;
 import model.domain.Duende;
+import model.domain.interfaces.EntityOnHorizon;
 import model.domain.Cluster;
 
 public class TreeMapAdaptado {

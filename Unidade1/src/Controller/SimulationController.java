@@ -7,8 +7,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import model.domain.datastructure.TreeMapAdaptado;
-import model.domain.Cluster;
 import model.domain.Duende;
+import model.domain.Cluster;
 import model.domain.interfaces.EntityOnHorizon;
 import view.SimulationView;
 

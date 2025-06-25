@@ -49,7 +49,7 @@ public class SimulationView extends JPanel {
     // <<< MUDANÇA: O método agora itera sobre a lista de entidades para encontrar os duendes
     private void loadSprites(List<EntityOnHorizon> entidadesIniciais) {
         try {
-            String resourcePath = "/resources/sprites/duende.png"; // Caminho absoluto no classpath
+            String resourcePath = "/model/domain/resources/sprites/duende.png"; // Caminho absoluto no classpath
             BufferedImage originalSprite = ImageIO.read(getClass().getResource(resourcePath));
 
             if (originalSprite != null) {

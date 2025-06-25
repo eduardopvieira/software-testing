@@ -79,9 +79,11 @@ public class SimulationController {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
-                for (Duende duende : duendes) {
-                    if (tma.treeMapPrincipal.containsValue(duende)) {
-                        processarTurno(duende, tma);
+                List<EntityOnHorizon> entidadesAtivas = new ArrayList<>(tma.treeMapPrincipal.values());
+
+                for (EntityOnHorizon entidade : entidadesAtivas) {
+                    if (tma.treeMapPrincipal.containsValue(entidade)) {
+                        processarTurno(entidade, tma);
                     }
                 }
 

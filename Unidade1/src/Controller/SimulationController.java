@@ -14,25 +14,17 @@ import model.domain.interfaces.EntityOnHorizon;
 import view.SimulationView;
 
 public class SimulationController {
-    private static long maxCoins;
     private static double maxHorizon;
     private GuardiaoDoHorizonte guardiao;
 
-    public void iniciarSimulacao(int numDuendes, double maxHorizon, long maxCoins) {
+    public void iniciarSimulacao(int numDuendes, double maxHorizon, String loginUsuario) {
         if (numDuendes <= 1 || numDuendes > 20) {
             throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
         }
         if (maxHorizon <= 0) {
             throw new IllegalArgumentException("O horizonte máximo deve ser maior que zero.");
         }
-        if (maxCoins <= 0) {
-            throw new IllegalArgumentException("O número máximo de moedas deve ser maior que zero.");
-        }
-        if (maxCoins > numDuendes * 1000000L) {
-            throw new IllegalArgumentException("O ponto de parada não pode ser maior que o valor total de moedas na simulação.");
-        }
 
-        SimulationController.maxCoins = maxCoins;
         SimulationController.maxHorizon = maxHorizon;
 
         List<Duende> duendes = criarDuendes(numDuendes);
@@ -208,10 +200,6 @@ public class SimulationController {
 
     public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
         for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
-            if (entidade.getCoins() >= maxCoins) {
-                System.out.println("FIM DE JOGO! Uma entidade atingiu " + entidade.getCoins() + " moedas.");
-                return true;
-            }
             if (entidade.getPosition() >= maxHorizon) {
                 System.out.println("FIM DE JOGO! Uma entidade atingiu o horizonte máximo: " + entidade.getPosition());
                 return true;

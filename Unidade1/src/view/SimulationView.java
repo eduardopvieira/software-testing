@@ -12,29 +12,30 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import model.domain.Cluster;
 import model.domain.Duende;
+import model.domain.GuardiaoDoHorizonte; // <<< MUDANÇA 1: Importar a classe Guardiao
 import model.domain.interfaces.EntityOnHorizon;
 
 public class SimulationView extends JPanel {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 400;
     private static final int GROUND_Y = 350;
-    private static final int TABLE_WIDTH = 250; //auemntei um pouco pra caber o texto
+    private static final int TABLE_WIDTH = 250;
     private static final int TABLE_HEIGHT = 150;
 
     private List<EntityOnHorizon> entidades;
     private final HashMap<Integer, BufferedImage> sprites;
+    private BufferedImage guardiaoSprite; // <<< MUDANÇA 2: Variável de instância para o sprite do guardião
 
     public SimulationView(List<EntityOnHorizon> entidadesIniciais) {
         this.entidades = new ArrayList<>(entidadesIniciais);
         this.sprites = new HashMap<>();
 
-        loadSprites(entidadesIniciais); // Passamos a lista para carregar os sprites corretos
+        loadSprites(entidadesIniciais);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(173, 216, 230));
     }
 
     public void updateEntidades(List<EntityOnHorizon> novasEntidades) {
-        // Usamos synchronized para garantir que a lista não seja modificada enquanto está sendo desenhada
         synchronized (this.entidades) {
             this.entidades.clear();
             this.entidades.addAll(novasEntidades);
@@ -46,14 +47,16 @@ public class SimulationView extends JPanel {
         return 50 + (int)(relativePosition * (WIDTH - 100));
     }
 
-    // <<< MUDANÇA: O método agora itera sobre a lista de entidades para encontrar os duendes
     private void loadSprites(List<EntityOnHorizon> entidadesIniciais) {
         try {
-            String resourcePath = "/model/domain/resources/sprites/duende.png"; // Caminho absoluto no classpath
+            String resourcePath = "/model/domain/resources/sprites/duende.png";
+            String guardiaoPath = "/model/domain/resources/sprites/guardiao-com-pa.png";
             BufferedImage originalSprite = ImageIO.read(getClass().getResource(resourcePath));
 
+            // <<< MUDANÇA 3: Carregar e armazenar o sprite do guardião
+            this.guardiaoSprite = ImageIO.read(getClass().getResource(guardiaoPath));
+
             if (originalSprite != null) {
-                // Itera sobre as entidades iniciais, que sabemos que são todos Duendes
                 for (EntityOnHorizon entidade : entidadesIniciais) {
                     if (entidade instanceof Duende) {
                         Duende d = (Duende) entidade;
@@ -71,13 +74,11 @@ public class SimulationView extends JPanel {
         }
     }
 
-    // <<< MUDANÇA: generateFallbackSprites também precisa da lista
     private void generateFallbackSprites(List<EntityOnHorizon> entidadesIniciais) {
         System.out.println("Gerando sprites alternativos...");
         for (EntityOnHorizon entidade : entidadesIniciais) {
             if (entidade instanceof Duende) {
                 Duende d = (Duende) entidade;
-                // ... (lógica de criação de fallback permanece a mesma)
                 BufferedImage fallback = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g2d = fallback.createGraphics();
                 Color color = Color.getHSBColor((d.getId() * 0.618f) % 1.0f, 0.7f, 0.9f);
@@ -98,18 +99,36 @@ public class SimulationView extends JPanel {
         drawBackground(g2d);
         drawGroundScale(g2d);
 
-        // <<< MUDANÇA: Lógica de desenho polimórfica
         synchronized (entidades) {
             for (EntityOnHorizon entidade : entidades) {
                 if (entidade instanceof Duende) {
                     drawDuendeWithSprite(g2d, (Duende) entidade);
                 } else if (entidade instanceof Cluster) {
                     drawCluster(g2d, (Cluster) entidade);
+                } else if (entidade instanceof GuardiaoDoHorizonte) { // <<< MUDANÇA 4: Adiciona a verificação do Guardião
+                    drawGuardiao(g2d, (GuardiaoDoHorizonte) entidade);
                 }
             }
         }
 
         drawTop5Table(g2d);
+    }
+
+    // <<< MUDANÇA 5: Novo método para desenhar o Guardião >>>
+    private void drawGuardiao(Graphics2D g2d, GuardiaoDoHorizonte guardiao) {
+        int x = normalizePosition(guardiao.getPosition());
+        int y = GROUND_Y - 70; // Mesma altura base dos duendes
+
+        if (this.guardiaoSprite != null) {
+            // Desenha o sprite do guardião (50x50 pixels)
+            g2d.drawImage(this.guardiaoSprite, x, y, 50, 50, null);
+        }
+
+        // Escreve as informações do guardião
+        g2d.setColor(Color.WHITE);
+        g2d.drawString("#" + guardiao.getId() + " Guardião", x - 10, y + 65);
+        g2d.setColor(new Color(255, 165, 0)); // Laranja para o ouro do guardião
+        g2d.drawString("$" + (guardiao.getCoins() / 1000) + "k", x + 10, y + 80);
     }
 
     private void drawDuendeWithSprite(Graphics2D g2d, Duende duende) {
@@ -127,27 +146,23 @@ public class SimulationView extends JPanel {
         g2d.drawString("$" + (duende.getCoins() / 1000) + "k", x + 10, y + 80);
     }
 
-    // <<< MUDANÇA: Novo método para desenhar um Cluster como uma torre
     private void drawCluster(Graphics2D g2d, Cluster cluster) {
         int x = normalizePosition(cluster.getPosition());
         int spriteHeight = 50;
-        int stackOverlap = 35; // Quanto um sprite sobe em relação ao anterior
+        int stackOverlap = 35;
 
         List<Duende> duendesNaTorre = cluster.getDuendes();
 
-        // Desenha a torre de duendes
         for (int i = 0; i < duendesNaTorre.size(); i++) {
             Duende duendeDaVez = duendesNaTorre.get(i);
             BufferedImage sprite = sprites.get(duendeDaVez.getId());
 
             if (sprite != null) {
-                // Cada duende é desenhado um pouco mais acima que o anterior
                 int y = (GROUND_Y - 70) - (i * stackOverlap);
                 g2d.drawImage(sprite, x, y, spriteHeight, spriteHeight, null);
             }
         }
 
-        // Desenha as informações do Cluster abaixo da torre
         int infoY = GROUND_Y + 15;
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 12));
@@ -160,15 +175,11 @@ public class SimulationView extends JPanel {
     }
 
     private void drawBackground(Graphics2D g2d) {
-        // Céu
         g2d.setColor(new Color(173, 216, 230));
         g2d.fillRect(0, 0, getWidth(), GROUND_Y);
-
-        // Grama
         g2d.setColor(new Color(34, 139, 34));
         g2d.fillRect(0, GROUND_Y, getWidth(), getHeight() - GROUND_Y);
     }
-
 
     private void drawGroundScale(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
@@ -184,10 +195,8 @@ public class SimulationView extends JPanel {
             g2d.drawLine(x, GROUND_Y + 15, x, GROUND_Y + 25);
             g2d.drawString(String.valueOf(i), x - 5, GROUND_Y + 40);
         }
-
     }
 
-    // <<< MUDANÇA: Tabela agora processa EntityOnHorizon
     private void drawTop5Table(Graphics2D g2d) {
         List<EntityOnHorizon> sorted;
         synchronized(entidades) {
@@ -213,14 +222,21 @@ public class SimulationView extends JPanel {
         for (int i = 0; i < limit; i++) {
             EntityOnHorizon e = sorted.get(i);
             String line;
+            // <<< MUDANÇA 6: Adiciona lógica para formatar o Guardião na tabela
             if (e instanceof Duende) {
                 Duende d = (Duende) e;
                 line = String.format("#Duende %d: Gold [%dk] - Pos [%.1f]",
                         d.getId(), d.getCoins() / 1000, d.getPosition());
-            } else {
+            } else if (e instanceof Cluster) {
                 Cluster c = (Cluster) e;
                 line = String.format("#Cluster (%d): Gold [%dk] - Pos [%.1f]",
                         c.getQuantityDuendes(), c.getCoins() / 1000, c.getPosition());
+            } else if (e instanceof GuardiaoDoHorizonte) {
+                GuardiaoDoHorizonte guard = (GuardiaoDoHorizonte) e;
+                line = String.format("#Guardião %d: Gold [%dk] - Pos [%.1f]",
+                        guard.getId(), guard.getCoins() / 1000, guard.getPosition());
+            } else {
+                line = "Entidade desconhecida";
             }
             g2d.drawString(line, tableX + 10, tableY + yOffset);
             yOffset += 20;

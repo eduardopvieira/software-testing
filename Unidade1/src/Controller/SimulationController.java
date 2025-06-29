@@ -199,12 +199,12 @@ public class SimulationController {
     }
 
     public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
-        for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
-            if (entidade.getPosition() >= maxHorizon) {
-                System.out.println("FIM DE JOGO! Uma entidade atingiu o horizonte máximo: " + entidade.getPosition());
-                return true;
-            }
+        if (tma.treeMapPrincipal.size() <= 2) {
+            System.out.println("FIM DE JOGO!");
+            
+            return true;
         }
+
         return false;
     }
 

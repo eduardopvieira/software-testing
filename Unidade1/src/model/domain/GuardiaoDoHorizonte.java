@@ -15,7 +15,7 @@ public class GuardiaoDoHorizonte implements EntityOnHorizon {
             throw new IllegalArgumentException("ID do guardião deve ser positivo.");
         }
         this.id = id;
-        this.coins = 0; // Inicia com 0 moedas, como especificado
+        this.coins = 1; // Inicia com 0 moedas, como especificado
         this.position = initialPosition;
         System.out.println("Guardião do Horizonte (ID: " + this.id + ") foi criado na posição " + this.position);
     }

@@ -4,31 +4,26 @@ public class Usuario {
     private int id;
     private String login;
     private String avatar;
-    private long pontuacao;
+    private int pontuacao;
+    private int simulacoesExecutadas;
 
-    public Usuario(int id, String login, String avatar, int pontuacao) {
+    public Usuario(int id, String login, String avatar, int pontuacao, int simulacoesExecutadas) {
         this.id = id;
         this.login = login;
         this.avatar = avatar;
         this.pontuacao = pontuacao;
+        this.simulacoesExecutadas = simulacoesExecutadas;
     }
 
+    // Getters
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
     public String getLogin() { return login; }
-    public void setLogin(String login) { this.login = login; }
     public String getAvatar() { return avatar; }
-    public void setAvatar(String avatar) { this.avatar = avatar; }
-    public long getPontuacao() { return pontuacao; }
-    public void setPontuacao(int pontuacao) { this.pontuacao = pontuacao; }
+    public int getPontuacao() { return pontuacao; }
+    public int getSimulacoesExecutadas() { return simulacoesExecutadas; }
 
     @Override
     public String toString() {
-        return "Usuario{" +
-                "id=" + id +
-                ", login='" + login + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", pontuacao=" + pontuacao +
-                '}';
+        return "Usuario{" + "id=" + id + ", login='" + login + '\'' + ", pontuacao=" + pontuacao + ", simulacoesExecutadas=" + simulacoesExecutadas + '}';
     }
 }

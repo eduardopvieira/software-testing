@@ -6,6 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UsuarioDAO {
 
@@ -74,7 +78,7 @@ public class UsuarioDAO {
 
 
     public Usuario buscarUsuario(String login) {
-        String sql = "SELECT id, login, avatar, pontuacao FROM usuarios WHERE login = ?";
+        String sql = "SELECT id, login, avatar, pontuacao, simulacoes_executadas FROM usuarios WHERE login = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -86,12 +90,85 @@ public class UsuarioDAO {
                         rs.getInt("id"),
                         rs.getString("login"),
                         rs.getString("avatar"),
-                        rs.getInt("pontuacao")
+                        rs.getInt("pontuacao"),
+                        rs.getInt("simulacoes_executadas")
                 );
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void incrementarPontuacao(String login) {
+        String sql = "UPDATE usuarios SET pontuacao = pontuacao + 1 WHERE login = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, login);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void incrementarSimulacoesExecutadas(String login) {
+        String sql = "UPDATE usuarios SET simulacoes_executadas = simulacoes_executadas + 1 WHERE login = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, login);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Retorna todos os usuários para a tabela de estatísticas
+    public List<Usuario> getTodosUsuarios() {
+        List<Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios ORDER BY pontuacao DESC";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                usuarios.add(new Usuario(
+                        rs.getInt("id"),
+                        rs.getString("login"),
+                        rs.getString("avatar"),
+                        rs.getInt("pontuacao"),
+                        rs.getInt("simulacoes_executadas")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return usuarios;
+    }
+
+    // Retorna as estatísticas globais
+    public Map<String, Double> getEstatisticasGerais() {
+        Map<String, Double> estatisticas = new HashMap<>();
+        String sql = "SELECT COUNT(*) AS total_usuarios, SUM(simulacoes_executadas) AS total_simulacoes, SUM(pontuacao) AS total_pontos FROM usuarios";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                double totalUsuarios = rs.getDouble("total_usuarios");
+                double totalSimulacoes = rs.getDouble("total_simulacoes");
+                double totalPontos = rs.getDouble("total_pontos");
+
+                estatisticas.put("total_simulacoes", totalSimulacoes);
+
+                if (totalUsuarios > 0) {
+                    estatisticas.put("media_bem_sucedidas", totalPontos / totalUsuarios);
+                } else {
+                    estatisticas.put("media_bem_sucedidas", 0.0);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return estatisticas;
     }
 }

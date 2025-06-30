@@ -77,7 +77,6 @@ public class LoginView {
         }
 
         if (usuarioDAO.verificarSenha(login, senha)) {
-            JOptionPane.showMessageDialog(frame, "Login bem-sucedido!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             frame.dispose();
             new ConfigSimulacaoView(login).exibir();
         } else {

@@ -24,14 +24,13 @@ public class LoginView {
     private void criarJanela() {
         frame = new JFrame("Login - Simulação de Duendes");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 250);
+        frame.setSize(450, 250);
         frame.setLayout(new BorderLayout(20, 20));
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- Campos de Login e Senha ---
         JLabel loginLabel = new JLabel("Login:");
         loginField = new JTextField(20);
 
@@ -45,10 +44,12 @@ public class LoginView {
 
         JButton loginButton = new JButton("Fazer Login");
         JButton criarContaButton = new JButton("Criar Conta");
+        JButton excluirContaButton = new JButton("Excluir Conta"); // <<< NOVO BOTÃO
 
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         botoesPanel.add(loginButton);
         botoesPanel.add(criarContaButton);
+        botoesPanel.add(excluirContaButton); // <<< ADICIONADO AO PAINEL
         botoesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel.add(loginLabel);
@@ -61,6 +62,7 @@ public class LoginView {
 
         loginButton.addActionListener(e -> tentarLogin());
         criarContaButton.addActionListener(e -> abrirDialogoCriarConta());
+        excluirContaButton.addActionListener(e -> abrirDialogoExcluirConta()); // <<< NOVA AÇÃO
 
         frame.add(panel, BorderLayout.CENTER);
     }
@@ -80,6 +82,39 @@ public class LoginView {
             new ConfigSimulacaoView(login).exibir();
         } else {
             JOptionPane.showMessageDialog(frame, "Login ou senha inválidos.", "Falha no Login", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void abrirDialogoExcluirConta() {
+        String loginParaExcluir = JOptionPane.showInputDialog(
+                frame,
+                "Digite o login da conta a ser excluída:",
+                "Excluir Conta",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (loginParaExcluir == null || loginParaExcluir.trim().isEmpty()) {
+            return;
+        }
+
+        int confirmacao = JOptionPane.showConfirmDialog(
+                frame,
+                "Você tem certeza que deseja excluir o usuário '" + loginParaExcluir.trim() + "'?\nEsta ação não pode ser desfeita.",
+                "Confirmação de Exclusão",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        if (confirmacao != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        boolean sucesso = usuarioDAO.excluirUsuario(loginParaExcluir.trim());
+
+        if (sucesso) {
+            JOptionPane.showMessageDialog(frame, "Usuário '" + loginParaExcluir.trim() + "' foi excluído com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(frame, "Nenhum usuário com o nome '" + loginParaExcluir.trim() + "' foi encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -106,13 +141,11 @@ public class LoginView {
         JPasswordField novaSenhaField = new JPasswordField(15);
         panel.add(novaSenhaField, gbc);
 
-        // seleção de avatares (colocar mais caso queira)
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
-        panel.add(new JSeparator(), gbc); // Linha separadora
+        panel.add(new JSeparator(), gbc);
 
         gbc.gridy = 3;
         panel.add(new JLabel("Escolha seu avatar:"), gbc);
-
 
         String avatar1Path = "/model/avatar/avatar-duende.jpg";
         String avatar2Path = "/model/avatar/avatar-guardian.jpg";
@@ -159,7 +192,7 @@ public class LoginView {
         confirmarButton.addActionListener(e -> {
             String login = novoLoginField.getText();
             String senha = new String(novaSenhaField.getPassword());
-            String avatarSelecionado = avatarGroup.getSelection().getActionCommand(); // Pega o caminho do avatar
+            String avatarSelecionado = avatarGroup.getSelection().getActionCommand();
 
             if (login.trim().isEmpty() || senha.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(dialogo, "Login e senha não podem ser vazios.", "Erro", JOptionPane.ERROR_MESSAGE);

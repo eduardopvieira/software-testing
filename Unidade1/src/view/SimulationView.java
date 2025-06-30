@@ -114,20 +114,17 @@ public class SimulationView extends JPanel {
         drawTop5Table(g2d);
     }
 
-    // <<< MUDANÇA 5: Novo método para desenhar o Guardião >>>
     private void drawGuardiao(Graphics2D g2d, GuardiaoDoHorizonte guardiao) {
         int x = normalizePosition(guardiao.getPosition());
-        int y = GROUND_Y - 70; // Mesma altura base dos duendes
+        int y = GROUND_Y - 70;
 
         if (this.guardiaoSprite != null) {
-            // Desenha o sprite do guardião (50x50 pixels)
             g2d.drawImage(this.guardiaoSprite, x, y, 50, 50, null);
         }
 
-        // Escreve as informações do guardião
         g2d.setColor(Color.WHITE);
         g2d.drawString("#" + guardiao.getId() + " Guardião", x - 10, y + 65);
-        g2d.setColor(new Color(255, 165, 0)); // Laranja para o ouro do guardião
+        g2d.setColor(new Color(255, 165, 0));
         g2d.drawString("$" + (guardiao.getCoins() / 1000) + "k", x + 10, y + 80);
     }
 
@@ -222,7 +219,6 @@ public class SimulationView extends JPanel {
         for (int i = 0; i < limit; i++) {
             EntityOnHorizon e = sorted.get(i);
             String line;
-            // <<< MUDANÇA 6: Adiciona lógica para formatar o Guardião na tabela
             if (e instanceof Duende) {
                 Duende d = (Duende) e;
                 line = String.format("#Duende %d: Gold [%dk] - Pos [%.1f]",

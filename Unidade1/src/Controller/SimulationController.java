@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import model.dao.UsuarioDAO;
 import model.domain.GuardiaoDoHorizonte;
 import model.domain.datastructure.TreeMapAdaptado;
 import model.domain.Duende;
@@ -16,6 +17,7 @@ import view.SimulationView;
 public class SimulationController {
     private static double maxHorizon;
     private GuardiaoDoHorizonte guardiao;
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     public void iniciarSimulacao(int numDuendes, double maxHorizon, String loginUsuario) {
         if (numDuendes <= 1 || numDuendes > 20) {
@@ -23,6 +25,9 @@ public class SimulationController {
         }
         if (maxHorizon <= 0) {
             throw new IllegalArgumentException("O horizonte máximo deve ser maior que zero.");
+        }
+        if (loginUsuario != null) {
+            usuarioDAO.incrementarSimulacoesExecutadas(loginUsuario);
         }
 
         SimulationController.maxHorizon = maxHorizon;
@@ -36,7 +41,7 @@ public class SimulationController {
         tma.treeMapPrincipal.put(this.guardiao.getPosition(), this.guardiao);
 
         SimulationView panel = criarEExibirJanela(new ArrayList<>(tma.treeMapPrincipal.values()));
-        executarLogicaSimulacao(tma, panel);
+        executarLogicaSimulacao(tma, panel, loginUsuario);
     }
 
     public static List<Duende> criarDuendes(int quantidade) {
@@ -70,37 +75,64 @@ public class SimulationController {
         return panel;
     }
 
-    public void executarLogicaSimulacao(TreeMapAdaptado tma, SimulationView panel) {
+    public void executarLogicaSimulacao(TreeMapAdaptado tma, SimulationView panel, String loginUsuario) {
         new Thread(() -> {
-            int iteracao = 0;
-            boolean jogoAcabou = false;
+            runGameLoop(tma, panel, loginUsuario);
+        }).start();
+    }
 
-            while (!jogoAcabou) {
-                iteracao++;
-                System.out.println("\nIteração " + iteracao);
+    private void runGameLoop(TreeMapAdaptado tma, SimulationView panel, String loginUsuario) {
+        boolean jogoAcabou = false;
+        int iteracao = 0;
 
-                List<EntityOnHorizon> entidadesNormais = new ArrayList<>(tma.treeMapPrincipal.values());
-                entidadesNormais.remove(this.guardiao);
+        while (!jogoAcabou) {
+            iteracao++;
+            System.out.println("\nIteração " + iteracao);
 
+            jogoAcabou = executarRodada(tma);
 
-                for (EntityOnHorizon entidade : entidadesNormais) {
-                    if (tma.treeMapPrincipal.containsValue(entidade)) {
-                        processarTurno(entidade, tma);
-                    }
-                }
+            panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
+            panel.repaint();
 
-                // --- TURNO DO GUARDIÃO ---
-                processarTurnoGuardiao(tma);
-
-                panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
-                panel.repaint();
-
-                jogoAcabou = verificarCondicaoDeTermino(tma);
+            if (!jogoAcabou) {
                 pausaVisualizacao();
             }
+        }
 
-            exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
-        }).start();
+        finalizarSimulacao(loginUsuario, tma);
+    }
+
+    private boolean executarRodada(TreeMapAdaptado tma) {
+        List<EntityOnHorizon> entidadesDaRodada = new ArrayList<>(tma.treeMapPrincipal.values());
+        entidadesDaRodada.remove(this.guardiao);
+
+        for (EntityOnHorizon entidade : entidadesDaRodada) {
+            if (tma.treeMapPrincipal.containsValue(entidade)) {
+                processarTurno(entidade, tma);
+
+                if (entidade.getPosition() >= maxHorizon) {
+                    System.out.println("FIM DE JOGO! " + TreeMapAdaptado.getNomeEntidade(entidade) + " atingiu o horizonte.");
+                    return true;
+                }
+            }
+        }
+
+        processarTurnoGuardiao(tma);
+
+        if (this.guardiao.getPosition() >= maxHorizon) {
+            System.out.println("FIM DE JOGO! O Guardião atingiu o horizonte.");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void finalizarSimulacao(String loginUsuario, TreeMapAdaptado tma) {
+        if (loginUsuario != null) {
+            usuarioDAO.incrementarPontuacao(loginUsuario);
+            System.out.println("Pontuação incrementada para o usuário: " + loginUsuario);
+        }
+        exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
     }
 
     public void processarTurno(EntityOnHorizon entidade, TreeMapAdaptado tma) {
@@ -142,14 +174,14 @@ public class SimulationController {
                 Cluster novoCluster = new Cluster((Duende) entidade, (Duende) ocupante);
                 tma.treeMapPrincipal.put(novaPosicao, novoCluster);
                 System.out.println("Resultado: Novo cluster formado.");
-                return novoCluster; // <<< CORREÇÃO: Retorna o NOVO cluster.
+                return novoCluster;
 
             } else if (entidade instanceof Cluster && ocupante instanceof Cluster) {
                 Cluster clusterBase = (Cluster) entidade;
                 clusterBase.addToCluster(ocupante);
                 tma.treeMapPrincipal.put(novaPosicao, clusterBase);
                 System.out.println("Resultado: Clusters se fundiram.");
-                return clusterBase; // <<< CORREÇÃO: Retorna o cluster que absorveu o outro.
+                return clusterBase;
 
             } else {
                 Cluster clusterExistente;
@@ -198,7 +230,7 @@ public class SimulationController {
         tma.treeMapPrincipal.put(novaPosicao, this.guardiao);
     }
 
-    public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
+    public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma, String loginUsuario) {
         for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
             if (entidade.getPosition() >= maxHorizon) {
                 System.out.println("FIM DE JOGO! Uma entidade atingiu o horizonte máximo: " + entidade.getPosition());
@@ -218,10 +250,10 @@ public class SimulationController {
             if (entidade instanceof Duende) {
                 Duende d = (Duende) entidade;
                 linha = String.format("Duende %d: %d Moedas (Pos: %.1f)\n", d.getId(), d.getCoins(), d.getPosition());
-            } else if (entidade instanceof Cluster) { // <<< ADICIONE "ELSE IF" AQUI
+            } else if (entidade instanceof Cluster) {
                 Cluster c = (Cluster) entidade;
                 linha = String.format("Cluster c/ %d duendes: %d Moedas (Pos: %.1f)\n", c.getQuantityDuendes(), c.getCoins(), c.getPosition());
-            } else if (entidade instanceof GuardiaoDoHorizonte) { // <<< ADICIONE ESTA CONDIÇÃO
+            } else if (entidade instanceof GuardiaoDoHorizonte) {
                 GuardiaoDoHorizonte g = (GuardiaoDoHorizonte) entidade;
                 linha = String.format("Guardião %d: %d Moedas (Pos: %.1f)\n", g.getId(), g.getCoins(), g.getPosition());
             } else {

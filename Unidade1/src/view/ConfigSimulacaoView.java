@@ -39,6 +39,7 @@ public class ConfigSimulacaoView {
         horizonteField = new JTextField(10);
 
         JButton startButton = new JButton("Iniciar Simulação");
+        JButton estatisticasButton = new JButton("Ver Estatísticas"); // <<< NOVO BOTÃO
 
         // Alinhamento
         duendesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -46,6 +47,7 @@ public class ConfigSimulacaoView {
         horizonteLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         horizonteField.setAlignmentX(Component.LEFT_ALIGNMENT);
         startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        estatisticasButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Adiciona componentes ao painel
         panel.add(duendesLabel);
@@ -55,6 +57,13 @@ public class ConfigSimulacaoView {
         panel.add(horizonteField);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
         panel.add(startButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(estatisticasButton);
+
+        frame.add(panel, BorderLayout.CENTER);
+
+        startButton.addActionListener(e -> iniciarSimulacao());
+        estatisticasButton.addActionListener(e -> new StatisticsView(frame).exibir());
 
         frame.add(panel, BorderLayout.CENTER);
 
@@ -80,7 +89,6 @@ public class ConfigSimulacaoView {
             SimulationController controller = new SimulationController();
 
             controller.iniciarSimulacao(numDuendes, maxHorizon, loginUsuario);
-
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Por favor, digite números válidos.", "Entrada Inválida", JOptionPane.ERROR_MESSAGE);
         }

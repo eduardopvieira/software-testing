@@ -1,5 +1,7 @@
 package Controller;
 
+import java.lang.reflect.Array;
+import java.security.Guard;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -41,7 +43,7 @@ public class SimulationController {
         tma.treeMapPrincipal.put(this.guardiao.getPosition(), this.guardiao);
 
         SimulationView panel = criarEExibirJanela(new ArrayList<>(tma.treeMapPrincipal.values()));
-        executarLogicaSimulacao(tma, panel, loginUsuario);
+        executarLogicaSimulacao(tma, panel);
     }
 
     public static List<Duende> criarDuendes(int quantidade) {
@@ -89,7 +91,14 @@ public class SimulationController {
             iteracao++;
             System.out.println("\nIteração " + iteracao);
 
-            jogoAcabou = executarRodada(tma);
+                ArrayList<EntityOnHorizon> entidadesAtuais = new ArrayList<>(tma.treeMapPrincipal.values());
+
+                for (EntityOnHorizon entidade : entidadesAtuais) {
+                    processarTurno(entidade, tma);
+                    // Pode haver remoções, então é necessário atualizar a lista de entidades
+                    entidadesAtuais = new ArrayList<>(tma.treeMapPrincipal.values());
+                }
+
 
             panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
             panel.repaint();
@@ -140,7 +149,9 @@ public class SimulationController {
         EntityOnHorizon ator = logicaMovimento(entidade, tma);
 
         // --- PARTE 2: ROUBO ---
-        logicaRoubo(ator, tma);
+        if (!(ator instanceof GuardiaoDoHorizonte)) {
+            logicaRoubo(ator, tma);
+        }
     }
 
     public void logicaRoubo(EntityOnHorizon entidade, TreeMapAdaptado tma) {
@@ -169,21 +180,89 @@ public class SimulationController {
             System.out.println("COLISÃO em " + novaPosicao + "! " + TreeMapAdaptado.getNomeEntidade(entidade) + " vs " + TreeMapAdaptado.getNomeEntidade(ocupante));
             tma.treeMapPrincipal.remove(novaPosicao);
 
-            if (entidade instanceof Duende && ocupante instanceof Duende) {
+            if (entidade instanceof GuardiaoDoHorizonte && ocupante instanceof Cluster) {
+                Cluster clusterVitima = (Cluster) ocupante;
+                GuardiaoDoHorizonte guardiao = (GuardiaoDoHorizonte) entidade;
+
+                System.out.println("GUARDIÃO " + guardiao.getId() + " COLIDIU COM UM CLUSTER NA POSIÇÃO " + novaPosicao);
+
+                long moedasAbsorvidas = clusterVitima.getCoins();
+                guardiao.addCoins(moedasAbsorvidas);
+
+                //tma.treeMapPrincipal.remove(novaPosicao);
+                System.out.println("Cluster com " + clusterVitima.getQuantityDuendes() + " duendes foi ELIMINADO. Guardião absorveu " + moedasAbsorvidas + " moedas.");
+
+                tma.treeMapPrincipal.put(novaPosicao, guardiao);
+
+                return guardiao;
+            }
+            else if (entidade instanceof Cluster && ocupante instanceof GuardiaoDoHorizonte) {
+                Cluster clusterVitima = (Cluster) entidade;
+                GuardiaoDoHorizonte guardiao = (GuardiaoDoHorizonte) ocupante;
+
+                System.out.println("CLUSTER " + guardiao.getId() + " COLIDIU COM UM GUARDIÃO NA POSIÇÃO " + novaPosicao);
+
+                long moedasAbsorvidas = clusterVitima.getCoins();
+                guardiao.addCoins(moedasAbsorvidas);
+
+                //tma.treeMapPrincipal.remove(novaPosicao);
+                System.out.println("Cluster com " + clusterVitima.getQuantityDuendes() + " duendes foi ELIMINADO. Guardião absorveu " + moedasAbsorvidas + " moedas.");
+
+                tma.treeMapPrincipal.put(novaPosicao, guardiao);
+                return guardiao;
+            }
+            else if (entidade instanceof GuardiaoDoHorizonte && ocupante instanceof Duende) {
+                Duende duende = (Duende) ocupante;
+                GuardiaoDoHorizonte guardiao = (GuardiaoDoHorizonte) entidade;
+
+                System.out.println("GUARDIÃO " + guardiao.getId() + " COLIDIU COM UM DUENDE NA POSIÇÃO " + novaPosicao);
+
+                long moedasRoubadas = duende.beingStealed();
+                guardiao.addCoins(moedasRoubadas);
+
+                //tma.treeMapPrincipal.remove(novaPosicao);
+                System.out.println("Duende " + duende.getId() + " foi ELIMINADO pelo guardião. Moedas roubadas: " + moedasRoubadas);
+
+                tma.treeMapPrincipal.put(novaPosicao, guardiao);
+
+
+                System.out.println("Na posição " + novaPosicao + " está a entidade " + TreeMapAdaptado.getNomeEntidade(guardiao));
+
+                return guardiao;
+            }
+            else if (entidade instanceof Duende && ocupante instanceof GuardiaoDoHorizonte) {
+                // Cenário 2: Duende colide com Guardião
+                Duende duende = (Duende) entidade;
+                GuardiaoDoHorizonte guardiao = (GuardiaoDoHorizonte) ocupante;
+
+                System.out.println("DUENDE " + duende.getId() + " COLIDIU COM UM GUARDIÃO NA POSIÇÃO " + novaPosicao);
+
+                long moedasRoubadas = duende.beingStealed();
+                guardiao.addCoins(moedasRoubadas);
+
+                //tma.treeMapPrincipal.remove(novaPosicao);
+                System.out.println("Duende " + duende.getId() + " foi ELIMINADO pelo guardião. Moedas roubadas: " + moedasRoubadas);
+
+                tma.treeMapPrincipal.put(novaPosicao, guardiao);
+                return guardiao; // <<< CORREÇÃO: Retorna o Guardião que roubou.
+            }
+            else if (entidade instanceof Duende && ocupante instanceof Duende) {
                 // Cenário 1: Duende colide com Duende
                 Cluster novoCluster = new Cluster((Duende) entidade, (Duende) ocupante);
                 tma.treeMapPrincipal.put(novaPosicao, novoCluster);
                 System.out.println("Resultado: Novo cluster formado.");
                 return novoCluster;
 
-            } else if (entidade instanceof Cluster && ocupante instanceof Cluster) {
+            }
+            else if (entidade instanceof Cluster && ocupante instanceof Cluster) {
                 Cluster clusterBase = (Cluster) entidade;
                 clusterBase.addToCluster(ocupante);
                 tma.treeMapPrincipal.put(novaPosicao, clusterBase);
                 System.out.println("Resultado: Clusters se fundiram.");
                 return clusterBase;
 
-            } else {
+            }
+            else {
                 Cluster clusterExistente;
                 EntityOnHorizon outro;
 
@@ -202,41 +281,13 @@ public class SimulationController {
         }
     }
 
-    public void processarTurnoGuardiao(TreeMapAdaptado tma) {
-        if (this.guardiao.getCoins() <= 0) {
-            return;
+    public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
+        if (tma.treeMapPrincipal.size() <= 2) {
+            System.out.println("FIM DE JOGO!");
+
+            return true;
         }
 
-        double posAntiga = this.guardiao.getPosition();
-
-        this.guardiao.move(maxHorizon);
-        double novaPosicao = this.guardiao.getPosition();
-
-        tma.treeMapPrincipal.remove(posAntiga);
-
-        EntityOnHorizon ocupante = tma.treeMapPrincipal.get(novaPosicao);
-
-        if (ocupante instanceof Cluster) {
-            Cluster clusterVitima = (Cluster) ocupante;
-            System.out.println("GUARDIÃO " + this.guardiao.getId() + " COLIDIU COM UM CLUSTER NA POSIÇÃO " + novaPosicao);
-
-            long moedasAbsorvidas = clusterVitima.getCoins();
-            this.guardiao.addCoins(moedasAbsorvidas);
-
-            tma.treeMapPrincipal.remove(novaPosicao);
-            System.out.println("Cluster com " + clusterVitima.getQuantityDuendes() + " duendes foi ELIMINADO. Guardião absorveu " + moedasAbsorvidas + " moedas.");
-        }
-
-        tma.treeMapPrincipal.put(novaPosicao, this.guardiao);
-    }
-
-    public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma, String loginUsuario) {
-        for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
-            if (entidade.getPosition() >= maxHorizon) {
-                System.out.println("FIM DE JOGO! Uma entidade atingiu o horizonte máximo: " + entidade.getPosition());
-                return true;
-            }
-        }
         return false;
     }
 

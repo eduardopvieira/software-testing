@@ -50,6 +50,7 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>Unidade1/src</sourceDirectory>
         <plugins>
             <!-- Plugin para garantir compatibilidade com Java 21 -->
             <plugin>

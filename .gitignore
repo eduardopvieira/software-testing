@@ -1,5 +1,4 @@
 *out/
 *.idea/
 *.class
-/simulationDB.mv.db
-/target/
+*.db

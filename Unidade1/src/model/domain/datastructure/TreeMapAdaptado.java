@@ -11,7 +11,7 @@ import model.domain.interfaces.EntityOnHorizon;
 import model.domain.Cluster;
 
 public class TreeMapAdaptado {
-
+    
     public TreeMap<Double, EntityOnHorizon> treeMapPrincipal = new TreeMap<>();
 
     public void addDuendeInicial(Duende entidade) {

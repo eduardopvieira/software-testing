@@ -22,16 +22,18 @@ public class GuardiaoDoHorizonte implements EntityOnHorizon {
 
     @Override
     public void move(double maxHorizon) {
-        if (this.coins <= 0) {
-            System.out.println("Guardião " + this.id + " não se move pois não possui moedas.");
-            return;
+        long coinFactor = this.coins;
+        int minCoinFactor = 1000000; // Fator mínimo de movimento
+        if (coinFactor <= minCoinFactor) {
+            coinFactor = minCoinFactor; // Garante que o fator de movimento não seja menor que 1000
         }
+        
         // xn+1 ← xn+1 + r * gn+1
         double r = random.nextDouble() * 2 - 1;
-        double newPos = this.position + r * this.coins;
+        double newPos = Math.round((this.position + r * coinFactor) * 10) / 10.0; // Arredondar para duas casas decimais
 
         if (newPos > maxHorizon) {
-            newPos = maxHorizon;
+            newPos = maxHorizon-1;
         } else if (newPos < 0) {
             newPos = 0;
         }

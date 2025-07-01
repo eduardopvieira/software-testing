@@ -22,10 +22,10 @@ public class Duende implements EntityOnHorizon {
     public void move(double maxHorizon) {
         double posAntiga = getPosition();
         double movimento = random.nextDouble() * 2 - 1;
-        double newPos = posAntiga + movimento * this.coins;
+        double newPos = Math.round((posAntiga + movimento * this.coins) * 10) / 10.0; // Arredondar para duas casas decimais
 
         if (newPos > maxHorizon) {
-            newPos = maxHorizon;
+            newPos = maxHorizon-1;    
         } else if (newPos < 0) {
             newPos = 0;
         }

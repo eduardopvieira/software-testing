@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import model.domain.Duende;
 import model.domain.GuardiaoDoHorizonte;
@@ -12,7 +11,7 @@ import model.domain.interfaces.EntityOnHorizon;
 import model.domain.Cluster;
 
 public class TreeMapAdaptado {
-
+    
     public TreeMap<Double, EntityOnHorizon> treeMapPrincipal = new TreeMap<>();
 
     public void addDuendeInicial(Duende entidade) {

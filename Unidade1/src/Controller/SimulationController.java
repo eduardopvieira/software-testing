@@ -81,21 +81,23 @@ public class SimulationController {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
-                ArrayList<EntityOnHorizon> entities = new ArrayList<>(tma.treeMapPrincipal.values());
+                ArrayList<EntityOnHorizon> entidadesAtuais = new ArrayList<>(tma.treeMapPrincipal.values());
 
-                for (EntityOnHorizon entidade : entities) {
+                for (EntityOnHorizon entidade : entidadesAtuais) {
                     processarTurno(entidade, tma);
+                    // Pode haver remoções, então é necessário atualizar a lista de entidades
+                    entidadesAtuais = new ArrayList<>(tma.treeMapPrincipal.values());
                 }
 
-                // --- TURNO DO GUARDIÃO ---
-                //processarTurnoGuardiao(tma);
 
-                panel.updateEntidades(entities);
+                panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
                 panel.repaint();
 
                 jogoAcabou = verificarCondicaoDeTermino(tma);
                 pausaVisualizacao();
             }
+            
+            panel.repaint();
 
             exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
         }).start();
@@ -181,7 +183,11 @@ public class SimulationController {
                 System.out.println("Duende " + duende.getId() + " foi ELIMINADO pelo guardião. Moedas roubadas: " + moedasRoubadas);
 
                 tma.treeMapPrincipal.put(novaPosicao, guardiao);
-                return guardiao; // <<< CORREÇÃO: Retorna o Guardião que roubou.
+
+
+                System.out.println("Na posição " + novaPosicao + " está a entidade " + TreeMapAdaptado.getNomeEntidade(guardiao));
+                
+                return guardiao;
             }
             else if (entidade instanceof Duende && ocupante instanceof GuardiaoDoHorizonte) {
                 // Cenário 2: Duende colide com Guardião

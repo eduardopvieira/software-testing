@@ -30,7 +30,7 @@ public class GuardiaoDoHorizonte implements EntityOnHorizon {
         
         // xn+1 ← xn+1 + r * gn+1
         double r = random.nextDouble() * 2 - 1;
-        double newPos = this.position + r * coinFactor;
+        double newPos = Math.round((this.position + r * coinFactor) * 10) / 10.0; // Arredondar para duas casas decimais
 
         if (newPos > maxHorizon) {
             newPos = maxHorizon-1;

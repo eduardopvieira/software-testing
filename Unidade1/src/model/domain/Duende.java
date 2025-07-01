@@ -25,7 +25,7 @@ public class Duende implements EntityOnHorizon {
         double newPos = posAntiga + movimento * this.coins;
 
         if (newPos > maxHorizon) {
-            newPos = maxHorizon;    
+            newPos = maxHorizon-1;    
         } else if (newPos < 0) {
             newPos = 0;
         }

@@ -30,24 +30,22 @@ public class ConfigSimulacaoView {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- Campo para número de duendes ---
         JLabel duendesLabel = new JLabel("Digite o número de duendes (2-20):");
         duendesField = new JTextField(10);
 
-        // --- Campo para tamanho do horizonte ---
         JLabel horizonteLabel = new JLabel("Digite o tamanho máximo do horizonte:");
         horizonteField = new JTextField(10);
 
         JButton startButton = new JButton("Iniciar Simulação");
+        JButton estatisticasButton = new JButton("Ver Estatísticas");
 
-        // Alinhamento
         duendesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         duendesField.setAlignmentX(Component.LEFT_ALIGNMENT);
         horizonteLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         horizonteField.setAlignmentX(Component.LEFT_ALIGNMENT);
         startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        estatisticasButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Adiciona componentes ao painel
         panel.add(duendesLabel);
         panel.add(duendesField);
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -55,6 +53,13 @@ public class ConfigSimulacaoView {
         panel.add(horizonteField);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
         panel.add(startButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(estatisticasButton);
+
+        frame.add(panel, BorderLayout.CENTER);
+
+        startButton.addActionListener(e -> iniciarSimulacao());
+        estatisticasButton.addActionListener(e -> new StatisticsView(frame).exibir());
 
         frame.add(panel, BorderLayout.CENTER);
 
@@ -77,9 +82,9 @@ public class ConfigSimulacaoView {
 
             frame.dispose();
 
-            SimulationController controller = new SimulationController();
+            SimulationController controller = new SimulationController(numDuendes, maxHorizon, loginUsuario);
+            controller.iniciar();
 
-            controller.iniciarSimulacao(numDuendes, maxHorizon, loginUsuario);
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Por favor, digite números válidos.", "Entrada Inválida", JOptionPane.ERROR_MESSAGE);

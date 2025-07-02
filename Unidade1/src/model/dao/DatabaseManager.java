@@ -20,7 +20,8 @@ public class DatabaseManager {
                 "  login VARCHAR(255) UNIQUE NOT NULL," +
                 "  senha VARCHAR(255) NOT NULL," +
                 "  avatar VARCHAR(255)," +
-                "  pontuacao INT DEFAULT 0" +
+                "  pontuacao INT DEFAULT 0," +
+                "  simulacoes_executadas INT DEFAULT 0" +
                 ");";
 
         try (Connection conn = getConnection();

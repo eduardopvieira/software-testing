@@ -1,256 +1,138 @@
 package Controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
+import model.dao.UsuarioDAO;
+import model.domain.Cluster;
+import model.domain.Duende;
 import model.domain.GuardiaoDoHorizonte;
 import model.domain.datastructure.TreeMapAdaptado;
-import model.domain.Duende;
-import model.domain.Cluster;
 import model.domain.interfaces.EntityOnHorizon;
 import view.SimulationView;
 
+import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SimulationController {
-    private static double maxHorizon;
-    private GuardiaoDoHorizonte guardiao;
 
-    public void iniciarSimulacao(int numDuendes, double maxHorizon, String loginUsuario) {
-        if (numDuendes <= 1 || numDuendes > 20) {
-            throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
+    private static volatile boolean simulacaoEmAndamento = false;
+
+    private final String loginUsuario;
+    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private final TreeMapAdaptado tma;
+    private final SimulationView panel;
+    private final SimulationEngine motor;
+
+    public int iteracao = 0;
+
+    public SimulationController(int numDuendes, double maxHorizon, String loginUsuario) {
+        if (simulacaoEmAndamento) {
+            this.tma = null;
+            this.panel = null;
+            this.motor = null;
+            this.loginUsuario = null;
+            return;
         }
-        if (maxHorizon <= 0) {
-            throw new IllegalArgumentException("O horizonte máximo deve ser maior que zero.");
-        }
+        simulacaoEmAndamento = true;
 
-        SimulationController.maxHorizon = maxHorizon;
+        this.loginUsuario = loginUsuario;
 
-        List<Duende> duendes = criarDuendes(numDuendes);
-        TreeMapAdaptado tma = inicializarTreeMap(duendes);
+        SimulationSetup setup = new SimulationSetup(numDuendes, maxHorizon);
+        this.tma = setup.criarCenario();
+        GuardiaoDoHorizonte guardiao = setup.criarGuardião();
+        this.tma.treeMapPrincipal.put(guardiao.getPosition(), guardiao);
 
-        double posGuardiao = maxHorizon * 0.8;
-
-        this.guardiao = new GuardiaoDoHorizonte(numDuendes + 1, posGuardiao);
-        tma.treeMapPrincipal.put(this.guardiao.getPosition(), this.guardiao);
-
-        SimulationView panel = criarEExibirJanela(new ArrayList<>(tma.treeMapPrincipal.values()));
-        executarLogicaSimulacao(tma, panel);
+        this.panel = criarEExibirJanela(new ArrayList<>(tma.treeMapPrincipal.values()), maxHorizon);
+        this.motor = new SimulationEngine(tma, maxHorizon);
     }
 
-    public static List<Duende> criarDuendes(int quantidade) {
-        if (quantidade <= 1 || quantidade > 20) {
-            throw new IllegalArgumentException("A quantidade de duendes deve ser de 2 a 20.");
+    public void iniciar() {
+        if (tma == null) return;
+
+        if (loginUsuario != null) {
+            usuarioDAO.incrementarSimulacoesExecutadas(loginUsuario);
         }
-        List<Duende> duendes = new ArrayList<>();
-        for (int i = 0; i < quantidade; i++) {
-            duendes.add(new Duende(i));
-        }
-        return duendes;
+        runGameLoop();
     }
 
-    public static TreeMapAdaptado inicializarTreeMap(List<Duende> duendes) {
-        if (duendes == null || duendes.isEmpty()) {
-            throw new IllegalArgumentException("A lista de duendes não pode ser nula ou vazia.");
-        }
-        TreeMapAdaptado tma = new TreeMapAdaptado();
-        duendes.forEach(tma::addDuendeInicial);
-        return tma;
+    private void runGameLoop() {
+        new Thread(() -> {
+            boolean jogoAcabou = false;
+            while (!jogoAcabou && simulacaoEmAndamento) {
+                iteracao++;
+                System.out.println("\nIteração " + iteracao);
+
+                motor.executarRodada();
+
+                panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()), iteracao);
+                panel.repaint();
+
+                jogoAcabou = motor.verificarCondicaoDeTermino();
+
+                if (!jogoAcabou) {
+                    pausaVisualizacao();
+                }
+            }
+            finalizarSimulacao();
+        }).start();
     }
 
-    public static SimulationView criarEExibirJanela(List<EntityOnHorizon> entidades) {
-        SimulationView panel = new SimulationView(entidades);
+    private void finalizarSimulacao() {
+        if (!simulacaoEmAndamento) return;
+
+        panel.repaint();
+
+        if (loginUsuario != null) {
+            usuarioDAO.incrementarPontuacao(loginUsuario);
+        }
+        exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
+
+        simulacaoEmAndamento = false;
+        System.out.println("Simulação finalizada. Trava liberada.");
+    }
+
+    private SimulationView criarEExibirJanela(ArrayList<EntityOnHorizon> entities, double maxHorizon) {
+        SimulationView panel = new SimulationView(entities, maxHorizon);
         JFrame simulationFrame = new JFrame("Simulação de Duendes & Clusters");
-        simulationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        simulationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         simulationFrame.add(panel);
+
+        simulationFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                simulacaoEmAndamento = false;
+                System.out.println("Janela de simulação fechada. Trava liberada.");
+            }
+        });
+
         simulationFrame.pack();
         simulationFrame.setLocationRelativeTo(null);
         simulationFrame.setVisible(true);
         return panel;
     }
 
-    public void executarLogicaSimulacao(TreeMapAdaptado tma, SimulationView panel) {
-        new Thread(() -> {
-            int iteracao = 0;
-            boolean jogoAcabou = false;
-
-            while (!jogoAcabou) {
-                iteracao++;
-                System.out.println("\nIteração " + iteracao);
-
-                List<EntityOnHorizon> entidadesNormais = new ArrayList<>(tma.treeMapPrincipal.values());
-                entidadesNormais.remove(this.guardiao);
-
-
-                for (EntityOnHorizon entidade : entidadesNormais) {
-                    if (tma.treeMapPrincipal.containsValue(entidade)) {
-                        processarTurno(entidade, tma);
-                    }
-                }
-
-                // --- TURNO DO GUARDIÃO ---
-                processarTurnoGuardiao(tma);
-
-                panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
-                panel.repaint();
-
-                jogoAcabou = verificarCondicaoDeTermino(tma);
-                pausaVisualizacao();
-            }
-
-            exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
-        }).start();
-    }
-
-    public void processarTurno(EntityOnHorizon entidade, TreeMapAdaptado tma) {
-        // --- PARTE 1: MOVIMENTO ---
-        EntityOnHorizon ator = logicaMovimento(entidade, tma);
-
-        // --- PARTE 2: ROUBO ---
-        logicaRoubo(ator, tma);
-    }
-
-    public void logicaRoubo(EntityOnHorizon entidade, TreeMapAdaptado tma) {
-        EntityOnHorizon vitima = tma.findNearestEntidade(entidade);
-        if (vitima != null && vitima != entidade) {
-            entidade.steal(vitima);
-            System.out.println(entidade.getId() + " agora possui " + entidade.getCoins() + " moedas.");
-        } else {
-            System.out.println("Nenhum vizinho para roubar.");
-        }
-    }
-
-    public EntityOnHorizon logicaMovimento(EntityOnHorizon entidade, TreeMapAdaptado tma) {
-        double posAntiga = entidade.getPosition();
-        tma.treeMapPrincipal.remove(posAntiga);
-
-        entidade.move(maxHorizon);
-        double novaPosicao = entidade.getPosition();
-
-        EntityOnHorizon ocupante = tma.treeMapPrincipal.get(novaPosicao);
-
-        if (ocupante == null) {
-            tma.treeMapPrincipal.put(novaPosicao, entidade);
-            return entidade; // <<< CORREÇÃO: Retorna a própria entidade que se moveu.
-        } else {
-            System.out.println("COLISÃO em " + novaPosicao + "! " + TreeMapAdaptado.getNomeEntidade(entidade) + " vs " + TreeMapAdaptado.getNomeEntidade(ocupante));
-            tma.treeMapPrincipal.remove(novaPosicao);
-
-            if (entidade instanceof Duende && ocupante instanceof Duende) {
-                // Cenário 1: Duende colide com Duende
-                Cluster novoCluster = new Cluster((Duende) entidade, (Duende) ocupante);
-                tma.treeMapPrincipal.put(novaPosicao, novoCluster);
-                System.out.println("Resultado: Novo cluster formado.");
-                return novoCluster; // <<< CORREÇÃO: Retorna o NOVO cluster.
-
-            } else if (entidade instanceof Cluster && ocupante instanceof Cluster) {
-                Cluster clusterBase = (Cluster) entidade;
-                clusterBase.addToCluster(ocupante);
-                tma.treeMapPrincipal.put(novaPosicao, clusterBase);
-                System.out.println("Resultado: Clusters se fundiram.");
-                return clusterBase; // <<< CORREÇÃO: Retorna o cluster que absorveu o outro.
-
-            } else {
-                Cluster clusterExistente;
-                EntityOnHorizon outro;
-
-                if (entidade instanceof Cluster) {
-                    clusterExistente = (Cluster) entidade;
-                    outro = ocupante;
-                } else {
-                    clusterExistente = (Cluster) ocupante;
-                    outro = entidade;
-                }
-                clusterExistente.addToCluster(outro);
-                tma.treeMapPrincipal.put(novaPosicao, clusterExistente);
-                System.out.println("Resultado: Duende foi adicionado ao cluster.");
-                return clusterExistente;
-            }
-        }
-    }
-
-    public void processarTurnoGuardiao(TreeMapAdaptado tma) {
-        if (this.guardiao.getCoins() <= 0) {
-            return;
-        }
-
-        double posAntiga = this.guardiao.getPosition();
-
-        this.guardiao.move(maxHorizon);
-        double novaPosicao = this.guardiao.getPosition();
-
-        tma.treeMapPrincipal.remove(posAntiga);
-
-        EntityOnHorizon ocupante = tma.treeMapPrincipal.get(novaPosicao);
-
-        if (ocupante instanceof Cluster) {
-            Cluster clusterVitima = (Cluster) ocupante;
-            System.out.println("GUARDIÃO " + this.guardiao.getId() + " COLIDIU COM UM CLUSTER NA POSIÇÃO " + novaPosicao);
-
-            long moedasAbsorvidas = clusterVitima.getCoins();
-            this.guardiao.addCoins(moedasAbsorvidas);
-
-            tma.treeMapPrincipal.remove(novaPosicao);
-            System.out.println("Cluster com " + clusterVitima.getQuantityDuendes() + " duendes foi ELIMINADO. Guardião absorveu " + moedasAbsorvidas + " moedas.");
-        }
-
-        tma.treeMapPrincipal.put(novaPosicao, this.guardiao);
-    }
-
-    public boolean verificarCondicaoDeTermino(TreeMapAdaptado tma) {
-        for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
-            if (entidade.getPosition() >= maxHorizon) {
-                System.out.println("FIM DE JOGO! Uma entidade atingiu o horizonte máximo: " + entidade.getPosition());
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void exibirResultadosFinais(List<EntityOnHorizon> entidades) {
-        System.out.println("\nResultado Final:");
+    private void exibirResultadosFinais(List<EntityOnHorizon> entidades) {
         entidades.sort((e1, e2) -> Long.compare(e2.getCoins(), e1.getCoins()));
-
         StringBuilder resultados = new StringBuilder("Fim da Simulação!\n\nResultado Final:\n");
         for (EntityOnHorizon entidade : entidades) {
-            String linha;
             if (entidade instanceof Duende) {
-                Duende d = (Duende) entidade;
-                linha = String.format("Duende %d: %d Moedas (Pos: %.1f)\n", d.getId(), d.getCoins(), d.getPosition());
-            } else if (entidade instanceof Cluster) { // <<< ADICIONE "ELSE IF" AQUI
-                Cluster c = (Cluster) entidade;
-                linha = String.format("Cluster c/ %d duendes: %d Moedas (Pos: %.1f)\n", c.getQuantityDuendes(), c.getCoins(), c.getPosition());
-            } else if (entidade instanceof GuardiaoDoHorizonte) { // <<< ADICIONE ESTA CONDIÇÃO
-                GuardiaoDoHorizonte g = (GuardiaoDoHorizonte) entidade;
-                linha = String.format("Guardião %d: %d Moedas (Pos: %.1f)\n", g.getId(), g.getCoins(), g.getPosition());
-            } else {
-                linha = "Entidade desconhecida.\n";
+                resultados.append(String.format("Duende %d: %d Moedas (Pos: %.1f)\n", entidade.getId(), entidade.getCoins(), entidade.getPosition()));
+            } else if (entidade instanceof Cluster) {
+                resultados.append(String.format("Cluster c/ %d duendes: %d Moedas (Pos: %.1f)\n", ((Cluster) entidade).getQuantityDuendes(), entidade.getCoins(), entidade.getPosition()));
+            } else if (entidade instanceof GuardiaoDoHorizonte) {
+                resultados.append(String.format("Guardião %d: %d Moedas (Pos: %.1f)\n", entidade.getId(), entidade.getCoins(), entidade.getPosition()));
             }
-            System.out.print(linha);
-            resultados.append(linha);
         }
-
         SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
-                resultados.toString(),
-                "Fim da Simulação",
-                JOptionPane.INFORMATION_MESSAGE));
+                resultados.toString(), "Fim da Simulação", JOptionPane.INFORMATION_MESSAGE));
     }
 
-    public static void pausaVisualizacao() {
+    private void pausaVisualizacao() {
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            e.printStackTrace();
         }
-    }
-
-    public static double getMaxHorizon() {
-        return maxHorizon;
-    }
-
-    public static void setMaxHorizon(double maxHorizon) {
-        SimulationController.maxHorizon = maxHorizon;
     }
 }

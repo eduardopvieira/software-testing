@@ -15,23 +15,25 @@ public class GuardiaoDoHorizonte implements EntityOnHorizon {
             throw new IllegalArgumentException("ID do guardião deve ser positivo.");
         }
         this.id = id;
-        this.coins = 0; // Inicia com 0 moedas, como especificado
+        this.coins = 0;
         this.position = initialPosition;
         System.out.println("Guardião do Horizonte (ID: " + this.id + ") foi criado na posição " + this.position);
     }
 
     @Override
     public void move(double maxHorizon) {
-        if (this.coins <= 0) {
-            System.out.println("Guardião " + this.id + " não se move pois não possui moedas.");
-            return;
+        long coinFactor = this.coins;
+        int minCoinFactor = 1000000;
+        if (coinFactor <= minCoinFactor) {
+            coinFactor = minCoinFactor;
         }
+        
         // xn+1 ← xn+1 + r * gn+1
         double r = random.nextDouble() * 2 - 1;
-        double newPos = this.position + r * this.coins;
+        double newPos = Math.round((this.position + r * coinFactor) * 10) / 10.0;
 
         if (newPos > maxHorizon) {
-            newPos = maxHorizon;
+            newPos = maxHorizon-1;
         } else if (newPos < 0) {
             newPos = 0;
         }
@@ -42,7 +44,6 @@ public class GuardiaoDoHorizonte implements EntityOnHorizon {
 
     @Override
     public void steal(EntityOnHorizon victim) {
-        // Não aplicável. A lógica de roubo
     }
 
     @Override

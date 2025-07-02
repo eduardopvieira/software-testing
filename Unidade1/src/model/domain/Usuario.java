@@ -15,7 +15,6 @@ public class Usuario {
         this.simulacoesExecutadas = simulacoesExecutadas;
     }
 
-    // Getters
     public int getId() { return id; }
     public String getLogin() { return login; }
     public String getAvatar() { return avatar; }

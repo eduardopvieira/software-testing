@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class StatisticsView {
     private JDialog dialogo;
-    private UsuarioDAO usuarioDAO;
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     public StatisticsView(Frame owner) {
         this.dialogo = new JDialog(owner, "Estatísticas da Simulação", true);

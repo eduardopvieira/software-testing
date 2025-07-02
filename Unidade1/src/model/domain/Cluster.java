@@ -39,7 +39,7 @@ public class Cluster implements EntityOnHorizon {
     public void move(double maxHorizon) {
         double posAntiga = getPosition();
         double movimento = random.nextDouble() * 2 - 1;
-        double newPos = Math.round((posAntiga + movimento * this.coins) * 10) / 10.0; // Arredondar para duas casas decimais
+        double newPos = Math.round((posAntiga + movimento * this.coins) * 10) / 10.0;
 
         if (newPos > maxHorizon) {
             newPos = maxHorizon-1;

@@ -22,7 +22,7 @@ public class Duende implements EntityOnHorizon {
     public void move(double maxHorizon) {
         double posAntiga = getPosition();
         double movimento = random.nextDouble() * 2 - 1;
-        double newPos = Math.round((posAntiga + movimento * this.coins) * 10) / 10.0; // Arredondar para duas casas decimais
+        double newPos = Math.round((posAntiga + movimento * this.coins) * 10) / 10.0;
 
         if (newPos > maxHorizon) {
             newPos = maxHorizon-1;    
@@ -72,7 +72,6 @@ public class Duende implements EntityOnHorizon {
 
     @Override
     public void setPosition(double position) {
-        // A validação no método move() já previne posições negativas. Essa ta aqui só pra preencher tabela
         if (position < 0) {
             throw new IllegalArgumentException("Posição não pode ser negativa.");
         }
@@ -85,7 +84,6 @@ public class Duende implements EntityOnHorizon {
     }
 
 
-    //metodo pra testes (se necessario)
     public void setCoins(long i) {
         this.coins = i;
     }

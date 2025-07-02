@@ -58,7 +58,6 @@ public class UsuarioDAO {
     }
 
     public boolean verificarSenha(String login, String senha) {
-        // <<< ALTERADO: A query agora seleciona a coluna "senha" >>>
         String sql = "SELECT senha FROM usuarios WHERE login = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -122,7 +121,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Retorna todos os usuários para a tabela de estatísticas
     public List<Usuario> getTodosUsuarios() {
         List<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT * FROM usuarios ORDER BY pontuacao DESC";
@@ -145,7 +143,6 @@ public class UsuarioDAO {
         return usuarios;
     }
 
-    // Retorna as estatísticas globais
     public Map<String, Double> getEstatisticasGerais() {
         Map<String, Double> estatisticas = new HashMap<>();
         String sql = "SELECT COUNT(*) AS total_usuarios, SUM(simulacoes_executadas) AS total_simulacoes, SUM(pontuacao) AS total_pontos FROM usuarios";

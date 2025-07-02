@@ -26,21 +26,24 @@ public class SimulationView extends JPanel {
     private final HashMap<Integer, BufferedImage> sprites;
     private BufferedImage guardiaoSprite;
     private final double maxHorizon;
+    private int iteracaoAtual;
 
     public SimulationView(List<EntityOnHorizon> entidadesIniciais, double maxHorizon) {
         this.entidades = new ArrayList<>(entidadesIniciais);
         this.sprites = new HashMap<>();
         this.maxHorizon = maxHorizon;
+        this.iteracaoAtual = 0;
 
         loadSprites(entidadesIniciais);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(173, 216, 230));
     }
 
-    public void updateEntidades(List<EntityOnHorizon> novasEntidades) {
+    public void updateEntidades(List<EntityOnHorizon> novasEntidades, int iteracao) {
         synchronized (this.entidades) {
             this.entidades.clear();
             this.entidades.addAll(novasEntidades);
+            this.iteracaoAtual = iteracao;
         }
     }
 
@@ -99,6 +102,7 @@ public class SimulationView extends JPanel {
 
         drawBackground(g2d);
         drawGroundScale(g2d);
+        drawIterationCounter(g2d);
 
         synchronized (entidades) {
             for (EntityOnHorizon entidade : entidades) {
@@ -113,6 +117,12 @@ public class SimulationView extends JPanel {
         }
 
         drawTop5Table(g2d);
+    }
+
+    private void drawIterationCounter(Graphics2D g2d) {
+        g2d.setFont(new Font("Arial", Font.BOLD, 16));
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("Iteração: " + this.iteracaoAtual, 10, 25);
     }
 
     private void drawGuardiao(Graphics2D g2d, GuardiaoDoHorizonte guardiao) {

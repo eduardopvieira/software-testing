@@ -24,6 +24,8 @@ public class SimulationController {
     private final SimulationView panel;
     private final SimulationEngine motor;
 
+    public int iteracao = 0;
+
     public SimulationController(int numDuendes, double maxHorizon, String loginUsuario) {
         if (simulacaoEmAndamento) {
             this.tma = null;
@@ -57,14 +59,13 @@ public class SimulationController {
     private void runGameLoop() {
         new Thread(() -> {
             boolean jogoAcabou = false;
-            int iteracao = 0;
             while (!jogoAcabou && simulacaoEmAndamento) {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
                 motor.executarRodada();
 
-                panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()));
+                panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()), iteracao);
                 panel.repaint();
 
                 jogoAcabou = motor.verificarCondicaoDeTermino();

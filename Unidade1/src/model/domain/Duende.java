@@ -1,13 +1,12 @@
 package model.domain;
 
-
 import model.domain.interfaces.EntityOnHorizon;
-
 import java.util.Random;
 
 public class Duende implements EntityOnHorizon {
 
-    private static final Random random = new Random();
+    // <<< MUDANÇA 1: Deixa de ser 'static final' e vira um campo de instância final >>>
+    private final Random random;
 
     private int id;
     private long coins;
@@ -17,6 +16,15 @@ public class Duende implements EntityOnHorizon {
         this.id = id;
         this.coins = 1000000L;
         this.position = id * 0.1;
+        random = new Random();
+    }
+
+    //esse construtor é necessário pra poder fazer o mock
+    public Duende(int id, Random random) {
+        this.id = id;
+        this.coins = 1000000L;
+        this.position = id * 0.1;
+        this.random = random;
     }
 
     public void move(double maxHorizon) {
@@ -25,13 +33,11 @@ public class Duende implements EntityOnHorizon {
         double newPos = Math.round((posAntiga + movimento * this.coins) * 10) / 10.0;
 
         if (newPos > maxHorizon) {
-            newPos = maxHorizon-1;    
+            newPos = maxHorizon - 1;
         } else if (newPos < 0) {
             newPos = 0;
         }
-
         this.setPosition(newPos);
-
         System.out.println("Duende " + this.getId() + " moveu-se para " + this.getPosition());
     }
 

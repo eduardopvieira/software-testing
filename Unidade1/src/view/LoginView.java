@@ -44,12 +44,12 @@ public class LoginView {
 
         JButton loginButton = new JButton("Fazer Login");
         JButton criarContaButton = new JButton("Criar Conta");
-        JButton excluirContaButton = new JButton("Excluir Conta"); // <<< NOVO BOTÃO
+        JButton excluirContaButton = new JButton("Excluir Conta");
 
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         botoesPanel.add(loginButton);
         botoesPanel.add(criarContaButton);
-        botoesPanel.add(excluirContaButton); // <<< ADICIONADO AO PAINEL
+        botoesPanel.add(excluirContaButton);
         botoesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel.add(loginLabel);
@@ -62,7 +62,7 @@ public class LoginView {
 
         loginButton.addActionListener(e -> tentarLogin());
         criarContaButton.addActionListener(e -> abrirDialogoCriarConta());
-        excluirContaButton.addActionListener(e -> abrirDialogoExcluirConta()); // <<< NOVA AÇÃO
+        excluirContaButton.addActionListener(e -> abrirDialogoExcluirConta());
 
         frame.add(panel, BorderLayout.CENTER);
     }
@@ -127,7 +127,6 @@ public class LoginView {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // login e senha
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(new JLabel("Login:"), gbc);
         gbc.gridx = 1; gbc.gridy = 0;
@@ -159,7 +158,7 @@ public class LoginView {
             System.err.println("Erro ao carregar imagens de avatar: " + e.getMessage());
         }
 
-        JRadioButton rbAvatar1 = new JRadioButton("Duende", avatar1Icon, true);
+        JRadioButton rbAvatar1 = new JRadioButton("Duende", avatar1Icon);
         rbAvatar1.setActionCommand(avatar1Path);
 
         JRadioButton rbAvatar2 = new JRadioButton("Guardião", avatar2Icon);
@@ -191,12 +190,18 @@ public class LoginView {
         confirmarButton.addActionListener(e -> {
             String login = novoLoginField.getText();
             String senha = new String(novaSenhaField.getPassword());
-            String avatarSelecionado = avatarGroup.getSelection().getActionCommand();
 
             if (login.trim().isEmpty() || senha.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(dialogo, "Login e senha não podem ser vazios.", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialogo, "Login e senha não podem ser vazios.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
+            if (avatarGroup.getSelection() == null) {
+                JOptionPane.showMessageDialog(dialogo, "Por favor, selecione um avatar.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String avatarSelecionado = avatarGroup.getSelection().getActionCommand();
 
             if (usuarioDAO.adicionarUsuario(login, senha, avatarSelecionado)) {
                 JOptionPane.showMessageDialog(frame, "Conta criada com sucesso! Agora você pode fazer o login.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);

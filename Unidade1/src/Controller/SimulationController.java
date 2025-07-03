@@ -16,8 +16,6 @@ import java.util.List;
 
 public class SimulationController {
 
-    private static volatile boolean simulacaoEmAndamento = false;
-
     private final String loginUsuario;
     private final UsuarioDAO usuarioDAO = new UsuarioDAO();
     private final TreeMapAdaptado tma;
@@ -27,15 +25,6 @@ public class SimulationController {
     public int iteracao = 0;
 
     public SimulationController(int numDuendes, double maxHorizon, String loginUsuario) {
-        if (simulacaoEmAndamento) {
-            this.tma = null;
-            this.panel = null;
-            this.motor = null;
-            this.loginUsuario = null;
-            return;
-        }
-        simulacaoEmAndamento = true;
-
         this.loginUsuario = loginUsuario;
 
         SimulationSetup setup = new SimulationSetup(numDuendes, maxHorizon);
@@ -60,7 +49,7 @@ public class SimulationController {
         new Thread(() -> {
             int resultado = 0;  // 0 = em andamento, 1 = vitória, -1 = derrota
 
-            while ((resultado == 0) && simulacaoEmAndamento) {
+            while (resultado == 0) {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
@@ -80,7 +69,6 @@ public class SimulationController {
     }
 
     private void finalizarSimulacao(int resultado) {
-        if (!simulacaoEmAndamento) return;
 
         panel.repaint();
 
@@ -90,7 +78,6 @@ public class SimulationController {
 
         exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
 
-        simulacaoEmAndamento = false;
         System.out.println("Simulação finalizada. Trava liberada.");
     }
 
@@ -103,7 +90,6 @@ public class SimulationController {
         simulationFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                simulacaoEmAndamento = false;
                 System.out.println("Janela de simulação fechada. Trava liberada.");
             }
         });

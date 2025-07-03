@@ -82,22 +82,14 @@ public class TreeMapAdaptado {
 
     public static String getNomeEntidade(EntityOnHorizon entidade) {
         if (entidade instanceof Duende) {
-            return "Duende " + ((Duende) entidade).getId();
+            return "Duende " + entidade.getId();
         } else if (entidade instanceof Cluster) {
             return "Cluster com " + ((Cluster) entidade).getQuantityDuendes() + " duendes";
         } else if (entidade instanceof GuardiaoDoHorizonte) {
-            return "Guardião " + ((GuardiaoDoHorizonte) entidade).getId();
+            return "Guardião " + entidade.getId();
         } else {
             return "Entidade desconhecida";
         }
     }
 
-    public GuardiaoDoHorizonte getGuardiao() {
-        for (EntityOnHorizon entidade : treeMapPrincipal.values()) {
-            if (entidade instanceof GuardiaoDoHorizonte) {
-                return (GuardiaoDoHorizonte) entidade;
-            }
-        }
-        return null; // se não encontrar, retorna nulo
-    }
 }

@@ -87,7 +87,7 @@ public class SimulationEngine {
         EntityOnHorizon resultado;
 
         if (entidadeQueSeMoveu instanceof GuardiaoDoHorizonte || ocupante instanceof GuardiaoDoHorizonte) {
-            resultado = resolverColisaoComGuardião(entidadeQueSeMoveu, ocupante);
+            resultado = resolverColisaoComGuardiao(entidadeQueSeMoveu, ocupante);
         } else if (entidadeQueSeMoveu instanceof Duende && ocupante instanceof Duende) {
             resultado = new Cluster((Duende) entidadeQueSeMoveu, (Duende) ocupante);
         } else if (entidadeQueSeMoveu instanceof Cluster && ocupante instanceof Cluster) {
@@ -104,14 +104,15 @@ public class SimulationEngine {
         return resultado;
     }
 
-    private EntityOnHorizon resolverColisaoComGuardião(EntityOnHorizon e1, EntityOnHorizon e2) {
-        GuardiaoDoHorizonte oGuardião = (e1 instanceof GuardiaoDoHorizonte) ? (GuardiaoDoHorizonte) e1 : (GuardiaoDoHorizonte) e2;
-        EntityOnHorizon outraEntidade = (oGuardião == e1) ? e2 : e1;
+    private EntityOnHorizon resolverColisaoComGuardiao(EntityOnHorizon e1, EntityOnHorizon e2) {
+        GuardiaoDoHorizonte guardiao = (e1 instanceof GuardiaoDoHorizonte) ? (GuardiaoDoHorizonte) e1 : (GuardiaoDoHorizonte) e2;
+        EntityOnHorizon outraEntidade = (guardiao == e1) ? e2 : e1;
 
         System.out.println("Guardião colidiu com " + TreeMapAdaptado.getNomeEntidade(outraEntidade));
-        long moedasRoubadas = outraEntidade.beingStealed();
-        oGuardião.addCoins(moedasRoubadas);
-        System.out.println(TreeMapAdaptado.getNomeEntidade(outraEntidade) + " foi absorvido. Guardião obteve " + moedasRoubadas + " moedas.");
-        return oGuardião;
+        long moedasAbsorvidas = outraEntidade.getCoins();
+
+        guardiao.addCoins(moedasAbsorvidas);
+        System.out.println(TreeMapAdaptado.getNomeEntidade(outraEntidade) + " foi absorvido. Guardião obteve " + moedasAbsorvidas + " moedas.");
+        return guardiao;
     }
 }

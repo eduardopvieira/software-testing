@@ -91,4 +91,13 @@ public class TreeMapAdaptado {
             return "Entidade desconhecida";
         }
     }
+
+    public GuardiaoDoHorizonte getGuardiao() {
+        for (EntityOnHorizon entidade : treeMapPrincipal.values()) {
+            if (entidade instanceof GuardiaoDoHorizonte) {
+                return (GuardiaoDoHorizonte) entidade;
+            }
+        }
+        return null; // se não encontrar, retorna nulo
+    }
 }

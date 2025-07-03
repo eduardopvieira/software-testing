@@ -29,12 +29,27 @@ public class SimulationEngine {
         }
     }
 
-    public boolean verificarCondicaoDeTermino() {
+    public int verificarCondicaoDeTermino() {
+        long guardiaoCoins = 0;
+        long duendesCoins = 0;
+
+        for (EntityOnHorizon entidade : tma.treeMapPrincipal.values()) {
+            if (entidade instanceof GuardiaoDoHorizonte) {
+                guardiaoCoins = ((GuardiaoDoHorizonte) entidade).getCoins();
+            } else {
+                duendesCoins += entidade.getCoins();
+            }
+        }
+
         if (tma.treeMapPrincipal.size() <= 2) {
             System.out.println("FIM DE JOGO! Apenas 2 ou menos entidades restantes.");
-            return true;
+            return 1;
+        } else if (guardiaoCoins > duendesCoins) {
+            System.out.println("FIM DE JOGO! Guardião do Horizonte venceu com " + guardiaoCoins + " moedas.");
+            return -1;
         }
-        return false;
+
+        return 0;
     }
 
     private void processarTurno(EntityOnHorizon entidade) {

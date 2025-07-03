@@ -58,8 +58,9 @@ public class SimulationController {
 
     private void runGameLoop() {
         new Thread(() -> {
-            boolean jogoAcabou = false;
-            while (!jogoAcabou && simulacaoEmAndamento) {
+            int resultado = 0;  // 0 = em andamento, 1 = vitória, -1 = derrota
+
+            while ((resultado == 0) && simulacaoEmAndamento) {
                 iteracao++;
                 System.out.println("\nIteração " + iteracao);
 
@@ -68,24 +69,25 @@ public class SimulationController {
                 panel.updateEntidades(new ArrayList<>(tma.treeMapPrincipal.values()), iteracao);
                 panel.repaint();
 
-                jogoAcabou = motor.verificarCondicaoDeTermino();
+                resultado = motor.verificarCondicaoDeTermino();
 
-                if (!jogoAcabou) {
+                if (resultado == 0) {
                     pausaVisualizacao();
                 }
             }
-            finalizarSimulacao();
+            finalizarSimulacao(resultado);
         }).start();
     }
 
-    private void finalizarSimulacao() {
+    private void finalizarSimulacao(int resultado) {
         if (!simulacaoEmAndamento) return;
 
         panel.repaint();
 
-        if (loginUsuario != null) {
+        if (loginUsuario != null && resultado == 1) {
             usuarioDAO.incrementarPontuacao(loginUsuario);
         }
+
         exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
 
         simulacaoEmAndamento = false;
@@ -130,7 +132,7 @@ public class SimulationController {
 
     private void pausaVisualizacao() {
         try {
-            Thread.sleep(300);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

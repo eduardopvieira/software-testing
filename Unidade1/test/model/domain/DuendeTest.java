@@ -17,12 +17,11 @@ class DuendeTest {
 
     @Mock
     private Random mockRandom;
-
     @Mock
     private EntityOnHorizon mockVictim;
 
     @Test
-    @DisplayName("Teste de Domínio: Construtor deve criar um duende com estado inicial correto")
+    @DisplayName("Construtor deve criar um duende com estado inicial correto")
     void constructor_deveInicializarComValoresPadrao() {
         Duende duende = new Duende(5);
         assertThat(duende.getId()).isEqualTo(5);
@@ -31,7 +30,7 @@ class DuendeTest {
     }
 
     @Test
-    @DisplayName("Teste Estrutural: Deve adicionar moedas ao saldo do duende")
+    @DisplayName("Deve adicionar moedas ao saldo do duende")
     void addCoins_deveAumentarTotalDeMoedas() {
         Duende duende = new Duende(1);
         duende.addCoins(500L);
@@ -39,7 +38,7 @@ class DuendeTest {
     }
 
     @Test
-    @DisplayName("Teste Estrutural: Deve perder metade das moedas ao ser roubado")
+    @DisplayName("Deve perder metade das moedas ao ser roubado")
     void beingStealed_deveReduzirMoedasPelaMetadeERetornarValorPerdido() {
         Duende duende = new Duende(1);
         long moedasPerdidas = duende.beingStealed();
@@ -48,17 +47,30 @@ class DuendeTest {
     }
 
     @Test
-    @DisplayName("Teste de Interação: Deve roubar moedas de uma vítima e adicioná-las ao seu saldo")
+    @DisplayName("Deve roubar moedas de uma vítima válida")
     void steal_deveChamarBeingStealedDaVitimaEAdicionarMoedas() {
         Duende ladrao = new Duende(1);
         when(mockVictim.beingStealed()).thenReturn(200_000L);
         ladrao.steal(mockVictim);
+
         verify(mockVictim).beingStealed();
         assertThat(ladrao.getCoins()).isEqualTo(1_200_000L);
     }
 
     @Test
-    @DisplayName("Teste de Fronteira: Deve lançar exceção ao definir posição negativa")
+    @DisplayName("Deve lançar exceção ao tentar roubar de vítima nula ou de si mesmo")
+    void steal_comVitimaInvalida_lancaExcecao() {
+        Duende duende = new Duende(1);
+
+        assertThatThrownBy(() -> duende.steal(null)) // victim == null
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> duende.steal(duende)) // victim == this
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao definir posição negativa")
     void setPosition_comValorNegativo_lancaExcecao() {
         Duende duende = new Duende(1);
         assertThatThrownBy(() -> duende.setPosition(-10.0))
@@ -66,9 +78,9 @@ class DuendeTest {
     }
 
     @Test
-    @DisplayName("Teste de Fronteira: Move não deve ultrapassar o horizonte máximo")
+    @DisplayName("Move não deve ultrapassar o horizonte máximo")
     void move_quandoCalculoExcedeHorizonte_posicaoFicaNoLimite() {
-        when(mockRandom.nextDouble()).thenReturn(0.99); // gera um movimento positivo grande
+        when(mockRandom.nextDouble()).thenReturn(0.99);
         Duende duende = new Duende(1, mockRandom);
         duende.setPosition(500.0);
         duende.move(1000.0);
@@ -76,9 +88,9 @@ class DuendeTest {
     }
 
     @Test
-    @DisplayName("Teste de Fronteira: Move não deve ter posição menor que zero")
+    @DisplayName("Move não deve ter posição menor que zero")
     void move_quandoCalculoEhNegativo_posicaoFicaZero() {
-        when(mockRandom.nextDouble()).thenReturn(0.01); // gera um movimento negativo grande
+        when(mockRandom.nextDouble()).thenReturn(0.01);
         Duende duende = new Duende(1, mockRandom);
         duende.setPosition(10.0);
         duende.move(1000.0);

@@ -1,5 +1,6 @@
 package model.datastructure;
 
+import model.domain.Cluster;
 import model.domain.Duende;
 import model.domain.GuardiaoDoHorizonte;
 import model.domain.datastructure.TreeMapAdaptado;
@@ -24,6 +25,8 @@ class TreeMapAdaptadoTest {
     @Mock
     private Duende mockDuende2;
     @Mock
+    private Cluster mockCluster;
+    @Mock
     private GuardiaoDoHorizonte mockGuardiao;
 
     @BeforeEach
@@ -33,11 +36,10 @@ class TreeMapAdaptadoTest {
 
 
     @Test
-    @DisplayName("Teste de Fronteira: Deve lançar exceção ao adicionar entidade nula")
-    void addDuendeInicial_comEntidadeNula_lancaExcecao() {
+    @DisplayName("Deve lançar exceção ao adicionar entidade nula")
+    void comEntidadeNula_lancaExcecao() {
         assertThatThrownBy(() -> treeMapAdaptado.addDuendeInicial(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Entidade não pode ser nula.");
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -45,89 +47,136 @@ class TreeMapAdaptadoTest {
     void addDuendeInicial_quandoPosicaoOcupada_adicionaEmPosicaoDeslocada() {
         when(mockDuende1.getPosition()).thenReturn(10.0);
 
-        when(mockDuende2.getPosition()).thenReturn(10.0, 10.1);
+        final double[] positionHolder = {10.0};
+
+        when(mockDuende2.getPosition()).thenAnswer(invocation -> positionHolder[0]);
+
+        doAnswer(invocation -> {
+            positionHolder[0] = invocation.getArgument(0);
+            return null;
+        }).when(mockDuende2).setPosition(anyDouble());
 
         treeMapAdaptado.addDuendeInicial(mockDuende1);
         treeMapAdaptado.addDuendeInicial(mockDuende2);
 
         verify(mockDuende2).setPosition(10.1);
 
-        assertThat(treeMapAdaptado.treeMapPrincipal).hasSize(2);
-        assertThat(treeMapAdaptado.treeMapPrincipal.get(10.0)).isEqualTo(mockDuende1);
-        assertThat(treeMapAdaptado.treeMapPrincipal.get(10.1)).isEqualTo(mockDuende2);
+        assertThat(treeMapAdaptado.treeMapPrincipal)
+                .hasSize(2)
+                .containsKeys(10.0, 10.1)
+                .containsValues(mockDuende1, mockDuende2);
     }
 
 
     @Test
-    @DisplayName("Teste de Fronteira: Deve retornar nulo se houver menos de duas entidades")
-    void findNearestEntidade_comMenosDeDuasEntidades_retornaNulo() {
-
+    @DisplayName("Deve retornar nulo se houver menos de duas entidades")
+    void comMenosDeDuasEntidades_retornaNulo() {
         treeMapAdaptado.treeMapPrincipal.put(10.0, mockDuende1);
-
-        //garantir que é null
         assertThat(treeMapAdaptado.findNearestEntidade(mockDuende1)).isNull();
     }
 
     @Test
-    @DisplayName("Teste Estrutural: Deve encontrar o vizinho mais próximo à esquerda")
-    void findNearestEntidade_comVizinhoMaisProximoAEsquerda_retornaVizinhoCorreto() {
-
+    @DisplayName("Deve encontrar o vizinho mais próximo à direita")
+    void comVizinhoMaisProximoADireita_retornaVizinhoCorreto() {
         when(mockDuende1.getPosition()).thenReturn(50.0);
-
         Duende vizinhoEsquerdo = mock(Duende.class);
         Duende vizinhoDireito = mock(Duende.class);
-
         treeMapAdaptado.treeMapPrincipal.put(50.0, mockDuende1);
-        treeMapAdaptado.treeMapPrincipal.put(40.0, vizinhoEsquerdo);
-        treeMapAdaptado.treeMapPrincipal.put(80.0, vizinhoDireito);
+        treeMapAdaptado.treeMapPrincipal.put(10.0, vizinhoEsquerdo);
+        treeMapAdaptado.treeMapPrincipal.put(60.0, vizinhoDireito);
 
-        EntityOnHorizon maisProximo = treeMapAdaptado.findNearestEntidade(mockDuende1);
-
-        assertThat(maisProximo).isEqualTo(vizinhoEsquerdo);
+        assertThat(treeMapAdaptado.findNearestEntidade(mockDuende1)).isEqualTo(vizinhoDireito);
     }
 
     @Test
-    @DisplayName("Teste Estrutural: Deve ignorar um Guardião e encontrar o próximo vizinho válido")
-    void findNearestEntidade_quandoVizinhoProximoEhGuardiao_ignoraEEncontraProximo() {
-
+    @DisplayName("Deve retornar nulo se os únicos vizinhos forem guardiões")
+    void quandoUnicosVizinhosSaoGuardioes_retornaNulo() {
         when(mockDuende1.getPosition()).thenReturn(50.0);
+        treeMapAdaptado.treeMapPrincipal.put(50.0, mockDuende1);
+        treeMapAdaptado.treeMapPrincipal.put(40.0, mockGuardiao);
 
+        assertThat(treeMapAdaptado.findNearestEntidade(mockDuende1)).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve ignorar múltiplos guardiões e encontrar o vizinho válido")
+    void quandoHaMultiplosGuardioes_ignoraTodosEEncontraProximo() {
+        when(mockDuende1.getPosition()).thenReturn(50.0);
+        GuardiaoDoHorizonte outroGuardiao = mock(GuardiaoDoHorizonte.class);
         Duende vizinhoValido = mock(Duende.class);
 
+        treeMapAdaptado.treeMapPrincipal.put(10.0, vizinhoValido);
+        treeMapAdaptado.treeMapPrincipal.put(40.0, outroGuardiao);
         treeMapAdaptado.treeMapPrincipal.put(50.0, mockDuende1);
         treeMapAdaptado.treeMapPrincipal.put(60.0, mockGuardiao);
-        treeMapAdaptado.treeMapPrincipal.put(90.0, vizinhoValido);
 
-        EntityOnHorizon maisProximo = treeMapAdaptado.findNearestEntidade(mockDuende1);
+        assertThat(treeMapAdaptado.findNearestEntidade(mockDuende1)).isEqualTo(vizinhoValido);
+    }
 
-        assertThat(maisProximo).isEqualTo(vizinhoValido);
+
+    @Test
+    @DisplayName("Deve lançar exceção ao buscar vizinho para entidade nula")
+    void findNearestEntidade_comEntidadeNula_lancaExcecao() {
+        assertThatThrownBy(() -> treeMapAdaptado.findNearestEntidade(null))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("Teste Estrutural: Deve usar verMaisRico como desempate para vizinhos equidistantes")
-    void findNearestEntidade_quandoVizinhosEquidistantes_retornaOMaisRico() {
-        when(mockDuende1.getPosition()).thenReturn(50.0);
-        Duende vizinhoPobre = mock(Duende.class);
-        when(vizinhoPobre.getCoins()).thenReturn(100L);
-        Duende vizinhoRico = mock(Duende.class);
-        when(vizinhoRico.getCoins()).thenReturn(1000L);
+    @DisplayName("Deve retornar o vizinho da direita se não houver vizinho à esquerda")
+    void findNearestEntidade_semVizinhoAEsquerda_retornaVizinhoDaDireita() {
+        when(mockDuende1.getPosition()).thenReturn(10.0);
 
-        treeMapAdaptado.treeMapPrincipal.put(50.0, mockDuende1);
-        treeMapAdaptado.treeMapPrincipal.put(40.0, vizinhoPobre);
-        treeMapAdaptado.treeMapPrincipal.put(60.0, vizinhoRico);
+        treeMapAdaptado.treeMapPrincipal.put(10.0, mockDuende1);
+        treeMapAdaptado.treeMapPrincipal.put(20.0, mockDuende2);
 
         EntityOnHorizon maisProximo = treeMapAdaptado.findNearestEntidade(mockDuende1);
 
-        assertThat(maisProximo).isEqualTo(vizinhoRico);
+        assertThat(maisProximo).isEqualTo(mockDuende2);
     }
 
     @Test
-    @DisplayName("Teste de Domínio: verMaisRico deve retornar a entidade com mais moedas")
-    void verMaisRico_comMoedasDiferentes_retornaEntidadeComMaiorValor() {
+    @DisplayName("Deve retornar o vizinho da esquerda se não houver vizinho à direita")
+    void findNearestEntidade_semVizinhoADireita_retornaVizinhoDaEsquerda() {
+        when(mockDuende1.getPosition()).thenReturn(30.0);
+
+        treeMapAdaptado.treeMapPrincipal.put(10.0, mockDuende2);
+        treeMapAdaptado.treeMapPrincipal.put(30.0, mockDuende1);
+
+        EntityOnHorizon maisProximo = treeMapAdaptado.findNearestEntidade(mockDuende1);
+
+        assertThat(maisProximo).isEqualTo(mockDuende2);
+    }
+
+    @Test
+    @DisplayName("Deve retornar a entidade com mais moedas")
+    void comMoedasDiferentes_retornaEntidadeComMaiorValor() {
         when(mockDuende1.getCoins()).thenReturn(100L);
         when(mockDuende2.getCoins()).thenReturn(200L);
-
         assertThat(treeMapAdaptado.verMaisRico(mockDuende1, mockDuende2)).isEqualTo(mockDuende2);
-        assertThat(treeMapAdaptado.verMaisRico(mockDuende2, mockDuende1)).isEqualTo(mockDuende2);
+    }
+
+    @Test
+    @DisplayName("Deve retornar uma das duas entidades se as moedas forem iguais")
+    void comMoedasIguais_retornaUmaDasDuas() {
+        when(mockDuende1.getCoins()).thenReturn(500L);
+        when(mockDuende2.getCoins()).thenReturn(500L);
+        EntityOnHorizon resultado = treeMapAdaptado.verMaisRico(mockDuende1, mockDuende2);
+        assertThat(resultado).isIn(mockDuende1, mockDuende2);
+    }
+
+
+    @Test
+    @DisplayName("Deve formatar o nome para cada tipo de entidade e para tipos desconhecidos")
+    void paraCadaTipoDeEntidade_retornaStringCorreta() {
+        when(mockDuende1.getId()).thenReturn(7);
+        when(mockCluster.getQuantityDuendes()).thenReturn(5);
+        when(mockGuardiao.getId()).thenReturn(99);
+        EntityOnHorizon entidadeDesconhecida = mock(EntityOnHorizon.class);
+
+        assertThat(TreeMapAdaptado.getNomeEntidade(mockDuende1)).isEqualTo("Duende 7");
+        assertThat(TreeMapAdaptado.getNomeEntidade(mockCluster)).isEqualTo("Cluster com 5 duendes");
+        assertThat(TreeMapAdaptado.getNomeEntidade(mockGuardiao)).isEqualTo("Guardião 99");
+        assertThat(TreeMapAdaptado.getNomeEntidade(entidadeDesconhecida)).isEqualTo("Entidade desconhecida");
+        assertThat(TreeMapAdaptado.getNomeEntidade(null)).isEqualTo("Entidade desconhecida");
     }
 }

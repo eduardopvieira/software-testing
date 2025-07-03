@@ -11,6 +11,9 @@ import static org.assertj.core.api.Assertions.*;
 
 class SimulationSetupTest {
 
+    // essa classe é responsável por configurar o cenário inicial da simulação, e por ser mais da área de UI,
+    // limitamos os testes a algumas funcionalidades básicas e validações de entrada.
+
     // testes de dominio e fronteira
 
     @Test
@@ -71,7 +74,7 @@ class SimulationSetupTest {
         assertThat(guardiao).isNotNull();
         // ID esperado: numDuendes + 1 = 11
         assertThat(guardiao.getId()).isEqualTo(numDuendes + 1);
-        // Posição esperada: 1000.0 * 0.8 = 800.0
+        // posicao esperada: 1000.0 * 0.8 = 800.0
         assertThat(guardiao.getPosition()).isEqualTo(maxHorizon * 0.8);
     }
 }

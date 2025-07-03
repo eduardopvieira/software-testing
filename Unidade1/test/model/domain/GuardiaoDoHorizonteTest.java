@@ -18,95 +18,102 @@ class GuardiaoDoHorizonteTest {
     @Mock
     private Random mockRandom;
 
-    //testando construtor e estado inicial
 
     @Test
-    @DisplayName("Teste de Fronteira: Deve lançar exceção se o ID for inválido")
+    @DisplayName("Deve lançar exceção se o ID for inválido")
     void constructor_comIdInvalido_lancaExcecao() {
-        // testando ids validos (n pode ser zero ou negativo)
         assertThatThrownBy(() -> new GuardiaoDoHorizonte(0, 100.0))
                 .isInstanceOf(IllegalArgumentException.class);
-
         assertThatThrownBy(() -> new GuardiaoDoHorizonte(-1, 100.0))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("Teste de Domínio: Deve ser criado com 0 moedas e na posição inicial correta")
+    @DisplayName("Deve ser criado com 0 moedas e na posição correta")
     void constructor_comDadosValidos_inicializaEstadoCorretamente() {
-
         GuardiaoDoHorizonte guardiao = new GuardiaoDoHorizonte(1, 200.0);
-
         assertThat(guardiao.getId()).isEqualTo(1);
         assertThat(guardiao.getCoins()).isZero();
         assertThat(guardiao.getPosition()).isEqualTo(200.0);
     }
 
-    // testes de interaçao:
 
     @Test
-    @DisplayName("Teste de Domínio: beingStealed não deve alterar as moedas e deve retornar 0")
+    @DisplayName("beingStealed não deve alterar as moedas e deve retornar 0")
     void beingStealed_naoAlteraMoedasERetornaZero() {
-
         GuardiaoDoHorizonte guardiao = new GuardiaoDoHorizonte(1, 100.0);
-        guardiao.addCoins(5000L); // Dá moedas ao guardião
-
+        guardiao.addCoins(5000L);
         long moedasPerdidas = guardiao.beingStealed();
 
         assertThat(moedasPerdidas).isZero();
-        assertThat(guardiao.getCoins()).isEqualTo(5000L); // saldo nao mudou
+        assertThat(guardiao.getCoins()).isEqualTo(5000L);
     }
 
     @Test
-    @DisplayName("Teste de Interação: steal não deve ter nenhum efeito")
+    @DisplayName("steal não deve ter nenhum efeito")
     void steal_naoExecutaNenhumaAcao() {
-
         GuardiaoDoHorizonte guardiao = new GuardiaoDoHorizonte(1, 100.0);
-        EntityOnHorizon vitima = mock(EntityOnHorizon.class); // criando um duble pra vitima
-
+        EntityOnHorizon vitima = mock(EntityOnHorizon.class);
         guardiao.steal(vitima);
 
-        verify(vitima, never()).beingStealed(); // metodo da vitima nunca foi chamado
+        verify(vitima, never()).beingStealed();
         assertThat(guardiao.getCoins()).isZero();
     }
 
-    // testando o movimento (metdoo move())
+    @Test
+    @DisplayName("Deve lançar exceção ao adicionar moedas negativas")
+    void addCoins_comValorNegativo_lancaExcecao() {
+        GuardiaoDoHorizonte guardiao = new GuardiaoDoHorizonte(1, 100.0);
+        assertThatThrownBy(() -> guardiao.addCoins(-100L))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
 
     @Test
-    @DisplayName("Teste Estrutural: Move deve usar fator de 1M quando o guardião tem poucas moedas")
+    @DisplayName("Move deve usar fator de 1M quando o guardião tem poucas moedas")
     void move_comPocasMoedas_usaFatorMinimo() throws Exception {
-        // guardião com 500 moedas
         GuardiaoDoHorizonte guardiao = new GuardiaoDoHorizonte(1, 500.0);
         guardiao.addCoins(500L);
-
-        // injetando o mock de random pra manipular resultados
-        when(mockRandom.nextDouble()).thenReturn(0.75); // resulta em r = 0.5
+        when(mockRandom.nextDouble()).thenReturn(0.75); // r = 0.5
         setRandom(guardiao, mockRandom);
 
-        guardiao.move(10000000.0);
+        guardiao.move(10_000_000.0);
 
-        // posição esperada = 500.0 + 0.5 * 1000000 = 500500.0
         double expectedPosition = 500.0 + (0.5 * 1_000_000);
         assertThat(guardiao.getPosition()).isEqualTo(Math.round(expectedPosition * 10) / 10.0);
     }
 
     @Test
-    @DisplayName("Teste Estrutural: Move deve usar o valor real das moedas quando for alto")
+    @DisplayName("Move deve usar o valor real das moedas quando for alto")
     void move_comMuitasMoedas_usaFatorReal() throws Exception {
         GuardiaoDoHorizonte guardiao = new GuardiaoDoHorizonte(1, 500.0);
         guardiao.addCoins(2_000_000L);
-
-        when(mockRandom.nextDouble()).thenReturn(0.75); // r = 0.5
+        when(mockRandom.nextDouble()).thenReturn(0.75);
         setRandom(guardiao, mockRandom);
 
-        guardiao.move(10000000.0);
+        guardiao.move(10_000_000.0);
 
-        // posição esperada = 500.0 + 0.5 * 2000000 = 1000500.0
         double expectedPosition = 500.0 + (0.5 * 2_000_000);
         assertThat(guardiao.getPosition()).isEqualTo(Math.round(expectedPosition * 10) / 10.0);
     }
 
-    //metodo auxiliar pra poder setar o random com algum resultado previsivel
+    @Test
+    @DisplayName("Move não deve ultrapassar os limites do horizonte")
+    void move_respeitaLimitesDoHorizonte() throws Exception {
+        GuardiaoDoHorizonte guardiao = new GuardiaoDoHorizonte(1, 50.0);
+        guardiao.addCoins(2_000_000L);
+        setRandom(guardiao, mockRandom);
+
+        when(mockRandom.nextDouble()).thenReturn(0.99);
+        guardiao.move(100.0);
+        assertThat(guardiao.getPosition()).isEqualTo(99.0);
+
+        guardiao.setPosition(50.0);
+        when(mockRandom.nextDouble()).thenReturn(0.01);
+        guardiao.move(100.0);
+        assertThat(guardiao.getPosition()).isZero();
+    }
+
     private void setRandom(GuardiaoDoHorizonte guardiao, Random mockRandom) throws Exception {
         java.lang.reflect.Field field = GuardiaoDoHorizonte.class.getDeclaredField("random");
         field.setAccessible(true);

@@ -20,7 +20,7 @@ public class ConfigSimulacaoView {
     private JTextField duendesField;
     private JTextField horizonteField;
     private String loginUsuario;
-    private JLabel avisoHorizonteLabel; // <<< NOVO: Label para o aviso
+    private JLabel avisoHorizonteLabel;
 
     public ConfigSimulacaoView(String loginUsuario) {
         this.loginUsuario = loginUsuario;
@@ -104,7 +104,6 @@ public class ConfigSimulacaoView {
             int numDuendes = Integer.parseInt(duendesField.getText());
             if (numDuendes > 0) {
                 long valorRecomendado = (long) numDuendes * 1_000_000L;
-                // Formata o número para incluir separadores de milhar (ex: 15.000.000)
                 String valorFormatado = NumberFormat.getNumberInstance(Locale.getDefault()).format(valorRecomendado);
 
                 avisoHorizonteLabel.setText("<html>OBS: O recomendado é <b>" + valorFormatado + "</b>. Diminua para simulações mais rápidas.</html>");
@@ -112,7 +111,6 @@ public class ConfigSimulacaoView {
                 avisoHorizonteLabel.setText("OBS: O número de duendes deve ser positivo.");
             }
         } catch (NumberFormatException e) {
-            // Se o campo estiver vazio ou com texto inválido, mostra uma mensagem padrão
             avisoHorizonteLabel.setText("OBS: Digite um número de duendes válido.");
         }
     }
@@ -144,20 +142,17 @@ public class ConfigSimulacaoView {
 
             // jframe
             JFrame simulationFrame = new JFrame("Simulação de Duendes & Clusters");
-            simulationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Fecha só esta janela
+            simulationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             simulationFrame.add(panel);
             simulationFrame.pack();
             simulationFrame.setLocationRelativeTo(null);
             simulationFrame.setVisible(true);
 
-            // dependencias restantes
             SimulationEngine motor = new SimulationEngine(tma, maxHorizon);
             UsuarioDAO dao = new UsuarioDAO();
 
-            // criando o controller com injeçao de dependencias
             SimulationController controller = new SimulationController(loginUsuario, dao, motor, panel, tma);
 
-            // iniciar
             controller.iniciar();
 
         } catch (NumberFormatException ex) {

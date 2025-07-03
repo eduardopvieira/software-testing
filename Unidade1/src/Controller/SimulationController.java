@@ -76,18 +76,8 @@ public class SimulationController {
 
     }
 
-    private SimulationView criarEExibirJanela(ArrayList<EntityOnHorizon> entities, double maxHorizon) {
-        SimulationView panel = new SimulationView(entities, maxHorizon);
-        JFrame simulationFrame = new JFrame("Simulação de Duendes & Clusters");
-        simulationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        simulationFrame.add(panel);
 
-        simulationFrame.pack();
-        simulationFrame.setLocationRelativeTo(null);
-        simulationFrame.setVisible(true);
-        return panel;
-    }
-
+    //TESTE DE UI!!! NÃO ESTÁ SENDO COBERTA!!
     private void exibirResultadosFinais(List<EntityOnHorizon> entidades) {
         entidades.sort((e1, e2) -> Long.compare(e2.getCoins(), e1.getCoins()));
         StringBuilder resultados = new StringBuilder("Fim da Simulação!\n\nResultado Final:\n");
@@ -104,6 +94,7 @@ public class SimulationController {
                 resultados.toString(), "Fim da Simulação", JOptionPane.INFORMATION_MESSAGE));
     }
 
+    //TESTE DE UI!!! NAO ESTÁ SENDO COBERTA!!
     private void pausaVisualizacao() {
         try {
             Thread.sleep(500);

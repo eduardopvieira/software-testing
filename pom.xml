@@ -69,7 +69,6 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>Unidade1/src</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

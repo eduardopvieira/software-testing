@@ -63,7 +63,6 @@ public class ConfigSimulacaoView {
 
         frame.add(panel, BorderLayout.CENTER);
 
-        startButton.addActionListener(e -> iniciarSimulacao());
     }
 
     private void iniciarSimulacao() {

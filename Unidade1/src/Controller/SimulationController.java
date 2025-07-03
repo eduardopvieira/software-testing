@@ -17,23 +17,19 @@ import java.util.List;
 public class SimulationController {
 
     private final String loginUsuario;
-    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private final UsuarioDAO usuarioDAO;
     private final TreeMapAdaptado tma;
     private final SimulationView panel;
     private final SimulationEngine motor;
 
     public int iteracao = 0;
 
-    public SimulationController(int numDuendes, double maxHorizon, String loginUsuario) {
+    public SimulationController(String loginUsuario, UsuarioDAO usuarioDAO, SimulationEngine motor, SimulationView panel, TreeMapAdaptado tma) {
         this.loginUsuario = loginUsuario;
-
-        SimulationSetup setup = new SimulationSetup(numDuendes, maxHorizon);
-        this.tma = setup.criarCenario();
-        GuardiaoDoHorizonte guardiao = setup.criarGuardião();
-        this.tma.treeMapPrincipal.put(guardiao.getPosition(), guardiao);
-
-        this.panel = criarEExibirJanela(new ArrayList<>(tma.treeMapPrincipal.values()), maxHorizon);
-        this.motor = new SimulationEngine(tma, maxHorizon);
+        this.usuarioDAO = usuarioDAO;
+        this.motor = motor;
+        this.panel = panel;
+        this.tma = tma;
     }
 
     public void iniciar() {
@@ -78,7 +74,6 @@ public class SimulationController {
 
         exibirResultadosFinais(new ArrayList<>(tma.treeMapPrincipal.values()));
 
-        System.out.println("Simulação finalizada. Trava liberada.");
     }
 
     private SimulationView criarEExibirJanela(ArrayList<EntityOnHorizon> entities, double maxHorizon) {
@@ -86,13 +81,6 @@ public class SimulationController {
         JFrame simulationFrame = new JFrame("Simulação de Duendes & Clusters");
         simulationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         simulationFrame.add(panel);
-
-        simulationFrame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent windowEvent) {
-                System.out.println("Janela de simulação fechada. Trava liberada.");
-            }
-        });
 
         simulationFrame.pack();
         simulationFrame.setLocationRelativeTo(null);

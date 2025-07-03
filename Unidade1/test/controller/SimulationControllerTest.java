@@ -58,8 +58,6 @@ class SimulationControllerTest {
         verify(mockUsuarioDAO, never()).incrementarSimulacoesExecutadas(anyString());
     }
 
-    // --- Testes para finalizarSimulacao() com cobertura MCDC ---
-
     @Test
     @DisplayName("MCDC (A=true, B=true): Finalizar com Vitória e com usuário deve incrementar pontuação")
     void finalizarSimulacao_comVitoriaEUsuario_deveIncrementarPontuacao() throws InterruptedException {

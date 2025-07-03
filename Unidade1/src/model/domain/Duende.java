@@ -5,7 +5,6 @@ import java.util.Random;
 
 public class Duende implements EntityOnHorizon {
 
-    // <<< MUDANÇA 1: Deixa de ser 'static final' e vira um campo de instância final >>>
     private final Random random;
 
     private int id;
@@ -89,8 +88,4 @@ public class Duende implements EntityOnHorizon {
         this.coins += amount;
     }
 
-
-    public void setCoins(long i) {
-        this.coins = i;
-    }
 }

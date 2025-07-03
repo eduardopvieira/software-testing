@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -17,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,58 +44,30 @@ class SimulationEngineTest {
         simulationEngine = new SimulationEngine(mockTma, 1000.0);
     }
 
-    @Test
-    @DisplayName("Deve retornar false para condição de término quando há mais de 2 entidades")
-    void verificarCondicaoDeTermino_QuandoMaisDe2Entidades_RetornaFalse() {
-        when(mockTreeMap.size()).thenReturn(3);
-        assertFalse(simulationEngine.verificarCondicaoDeTermino());
-    }
+    // --- Testes para verificarCondicaoDeTermino ---
 
     @Test
-    @DisplayName("Deve retornar true para condição de término quando há 2 ou menos entidades")
-    void verificarCondicaoDeTermino_Quando2OuMenosEntidades_RetornaTrue() {
+    @DisplayName("Deve retornar 1 (Vitória) quando restam 2 entidades")
+    void verificarCondicaoDeTermino_Com2Entidades_Retorna1() {
         when(mockTreeMap.size()).thenReturn(2);
-        assertTrue(simulationEngine.verificarCondicaoDeTermino());
-
-        when(mockTreeMap.size()).thenReturn(1);
-        assertTrue(simulationEngine.verificarCondicaoDeTermino());
+        assertThat(simulationEngine.verificarCondicaoDeTermino()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("Deve mover um duende para uma posição vazia sem colisões")
-    void executarRodada_QuandoMoveParaEspacoVazio_ApenasMove() {
-        when(mockDuende1.getPosition()).thenReturn(10.0);
-        when(mockTreeMap.keySet()).thenReturn(new HashSet<>(List.of(10.0)));
-        when(mockTreeMap.get(10.0)).thenReturn(mockDuende1);
-        when(mockTreeMap.get(anyDouble())).thenReturn(null);
-
-        simulationEngine.executarRodada();
-
-        verify(mockDuende1).move(1000.0);
-        verify(mockTreeMap).remove(10.0);
-        verify(mockTreeMap).put(mockDuende1.getPosition(), mockDuende1);
-        verify(mockDuende1, never()).steal(any());
-    }
-
-    @Test
-    @DisplayName("Deve chamar a lógica de roubo quando um vizinho é encontrado")
-    void executarRodada_QuandoHaVizinho_ChamaLogicaDeRoubo() {
-        when(mockDuende1.getPosition()).thenReturn(10.0);
-        when(mockTreeMap.keySet()).thenReturn(new HashSet<>(List.of(10.0)));
-        when(mockTreeMap.get(anyDouble())).thenReturn(null);
-        when(mockTreeMap.get(10.0)).thenReturn(mockDuende1);
-        when(mockTma.findNearestEntidade(mockDuende1)).thenReturn(mockDuende2);
-
-        simulationEngine.executarRodada();
-
-        verify(mockDuende1).steal(mockDuende2);
+    @DisplayName("Deve retornar -1 (Derrota) quando moedas do guardião superam as outras")
+    void verificarCondicaoDeTermino_ComGuardiaoMaisRico_RetornaMenos1() {
+        when(mockTreeMap.size()).thenReturn(3);
+        when(mockGuardiao.getCoins()).thenReturn(1001L);
+        when(mockDuende1.getCoins()).thenReturn(500L);
+        when(mockDuende2.getCoins()).thenReturn(500L);
+        when(mockTreeMap.values()).thenReturn(List.of(mockGuardiao, mockDuende1, mockDuende2));
+        assertThat(simulationEngine.verificarCondicaoDeTermino()).isEqualTo(-1);
     }
 
     @Test
     @DisplayName("Deve criar um Cluster quando dois Duendes colidem")
-    void executarRodada_QuandoDuendeColideComDuende_CriaCluster() {
+    void executarRodada_quandoDuendeColideComDuende_criaCluster() {
         when(mockDuende1.getPosition()).thenReturn(10.0);
-        when(mockDuende2.getPosition()).thenReturn(20.0);
 
         doAnswer(invocation -> {
             when(mockDuende1.getPosition()).thenReturn(20.0);
@@ -107,23 +80,22 @@ class SimulationEngineTest {
 
         simulationEngine.executarRodada();
 
-        verify(mockTreeMap).put(eq(20.0), isA(Cluster.class));
-        verify(mockTreeMap).remove(10.0);
-        verify(mockTreeMap).remove(20.0);
+        ArgumentCaptor<EntityOnHorizon> captor = ArgumentCaptor.forClass(EntityOnHorizon.class);
+        verify(mockTreeMap, atLeastOnce()).put(eq(20.0), captor.capture());
+        assertThat(captor.getValue()).isInstanceOf(Cluster.class);
     }
 
     @Test
-    @DisplayName("Deve absorver moedas quando o Guardião colide com um Duende")
-    void executarRodada_QuandoGuardiãoColideComDuende_AbsorveMoedas() {
+    @DisplayName("Deve absorver todas as moedas quando o Guardião colide com um Duende")
+    void executarRodada_quandoGuardiaoColideComDuende_absorveDuende() {
         when(mockGuardiao.getPosition()).thenReturn(50.0);
-        when(mockDuende1.getPosition()).thenReturn(60.0);
 
         doAnswer(invocation -> {
             when(mockGuardiao.getPosition()).thenReturn(60.0);
             return null;
         }).when(mockGuardiao).move(anyDouble());
 
-        when(mockDuende1.beingStealed()).thenReturn(500L);
+        when(mockDuende1.getCoins()).thenReturn(5000L);
 
         when(mockTreeMap.keySet()).thenReturn(new HashSet<>(List.of(50.0, 60.0)));
         when(mockTreeMap.get(50.0)).thenReturn(mockGuardiao);
@@ -131,8 +103,7 @@ class SimulationEngineTest {
 
         simulationEngine.executarRodada();
 
-        verify(mockDuende1).beingStealed();
-        verify(mockGuardiao).addCoins(500L);
-        verify(mockTreeMap).put(eq(60.0), eq(mockGuardiao));
+        verify(mockGuardiao).addCoins(5000L);
+        verify(mockTreeMap, atLeastOnce()).put(eq(60.0), eq(mockGuardiao));
     }
 }

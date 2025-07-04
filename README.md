@@ -6,6 +6,8 @@
 
 ## Índice
 - [1. Problema e Requisitos](#1-problema-e-requisitos)
+  - [1.1 Requisitos da Simulação](#11-requisitos-da-simulação)
+  - [1.2 Requisitos de sistema](#12-requisitos-de-sistema)
 - [2. Resolução Proposta](#2-resolução-proposta)
   - [2.1 Tecnologias Usadas](#21-tecnologias-usadas)
   - [2.2 Estrutura do Projeto](#22-estrutura-do-projeto)
@@ -20,22 +22,36 @@
 # 1. Problema e Requisitos
 Implementem, em Java, uma simulação de criaturas saltitantes, conforme requisitos, a seguir:
 
+## 1.1 Requisitos da Simulação
 - A simulação compreende $n$ criaturas, numeradas de $1$ a $n$.
 - Para cada criatura $i$, $1 ≤ i ≤ n$, a simulação mantém uma quantidade de moedas de ouro $g_i$, cujo valor inicial é um milhão.
 - A simulação mantém, ainda, para cada criatura $i$, um lugar no horizonte, que é representado com um número de ponto flutuante de dupla precisão, $x_i$.
 - Em cada iteração da simulação, as criaturas são processadas na ordem.
+- Crie uma criatura especial, denominada "guardião do horizonte", cujo índice deve ser $n+1$, para n criaturas saltitantes. Para o guardião, a simulação mantém uma quantidade de moedas de ouro $g_n+1$, cujo valor inicial é 0 (zero), e um lugar no horizonte que é representado por um número de ponto flutuante de dupla precisão $x_n+1$.
 - O processamento de uma criatura em uma iteração inicia pela computação de um novo lugar no horizonte para $i$, que é determinado por $x_i ← x_i + rg_i$, onde $r$ é um número de ponto flutuante gerado aleatoriamente dentro do intervalo $−1$ e $1$. A criatura $i$ então rouba metade das moedas de ouro da criatura mais próxima de um dos seus lados e adiciona esta quantidade em seu respectivo $g_i$.
-- A simulação deve permitir a visualização gráfica de uma série de iterações para um dado número n de criaturas. 
+- Se o novo lugar computado já estiver ocupado, digamos pela criatura $j$, tais criaturas se unem para formar um cluster$_{ij}$, somando suas moedas de ouro, ou seja, $g_{ij} = g_i + g_j$.
+- A cada iteração, o guardião deve ser processado após as $n$ criaturas/clusters existentes naquele momento. A computação de um novo lugar no horizonte para o guardião é idêntico a das criaturas saltitantes (i.e., determinado por $x_n+1 ← x_n+1 + rg_n+1$, onde $r$ é um número de ponto flutuante gerado aleatoriamente dentro do intervalo −1 e 1). Todavia, se o novo lugar computado para o guardião já estiver ocupado por um cluster, digamos o cluster$_{ij}$, tal cluster é eliminado do horizonte e seu respectivo $g_{ij}$ é adicionado ao $g_n+1$, ou seja, $g_n+1 = g_n+1 + g_{ij}$.
+- A simulação deve permitir a visualização gráfica de uma série de iterações para um dado número $n$ de criaturas. 
+- A simulação é considerada bem-sucedida quando, no horizonte,  restarem apenas o guardião e uma criatura saltitante $i$, sendo que $g_n+1 > g_i$ ou restar apenas o guardião.
 
+## 1.2 Requisitos de sistema
+- Forneçam as funcionalidades de inclusão e exclusão de usuários. Para cada usuário, considerem login, senha, avatar e pontuação (quantidade de simulações bem-sucedidas). 
+- Forneçam a funcionalidade de estatísticas da simulação, especificamente: pontuação obtida por cada usuário, quantidade de simulações executadas por usuário, quantidade total de simulações, média de simulações bem-sucedidas por usuário e média total de simulações bem-sucedidas. Tal funcionalidade deve ser acessível a todos os usuários cadastrados.
 
 # 2. Resolução Proposta
 Esta resolução conta com a implementação de um **treemap** para gerenciar as posições das criaturas, permitindo a busca da criatura mais próxima de forma eficiente. A cada iteração, a posição de cada criatura é atualizada e a quantidade de moedas é ajustada conforme as regras do problema.
 
+Para evitar que o guardião fique preso por começar com 0 moedas, ele é processado com um fator mínimo de 1.000.000 para multiplicar o componente aleatório.
+
+Durante as execuções notou-se que é difícil haver colisões devido ao alto número de posições possíveis no horizonte. Por isso, toda nova posição é limitada à primeira casa decimal, o que aumenta a chance de colisão, e consequentemente, da formação de clusters. Além disso, ao tentar ultrapassar um dos limites do horizonte (inferior ou superior), a criatura tem seu movimento restringido ao limite, garantindo que não saia do horizonte.
+
 ## 2.1 Tecnologias Usadas
 Para este projeto, foram utilizadas as seguintes tecnologias:
-- Java 21
-- Swing para a interface gráfica
-- JUnit para testes
+- Java 21 + Maven
+- Swing
+- JUnit
+- Mockito
+- AssertJ
 
 ## 2.2 Estrutura do Projeto
 A arquitetura do projeto segue um padrão MVC (Model-View-Controller) para melhor organização sem adição desnecessária de complexidade. 

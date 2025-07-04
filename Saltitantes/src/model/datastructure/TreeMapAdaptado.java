@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 
-import model.Duende;
+import model.domain.Duende;
 
 public class TreeMapAdaptado {
     public TreeMap<Double, Duende> treeMapPrincipal = new TreeMap<>();

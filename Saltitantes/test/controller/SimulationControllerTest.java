@@ -3,7 +3,7 @@ package controller;
 import Controller.SimulationController;
 import Controller.SimulationEngine;
 import model.dao.UsuarioDAO;
-import model.domain.datastructure.TreeMapAdaptado;
+import model.datastructure.TreeMapAdaptado;
 import view.SimulationView;
 
 import org.junit.jupiter.api.BeforeEach;

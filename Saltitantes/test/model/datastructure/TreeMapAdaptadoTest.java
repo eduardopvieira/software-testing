@@ -1,10 +1,10 @@
 package model.datastructure;
 
-import model.domain.Cluster;
-import model.domain.Duende;
-import model.domain.GuardiaoDoHorizonte;
-import model.domain.datastructure.TreeMapAdaptado;
-import model.domain.interfaces.EntityOnHorizon;
+import model.entities.Cluster;
+import model.entities.Duende;
+import model.entities.GuardiaoDoHorizonte;
+import model.datastructure.TreeMapAdaptado;
+import model.entities.interfaces.EntityOnHorizon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

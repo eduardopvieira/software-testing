@@ -1,8 +1,9 @@
 package Controller;
 
-import model.domain.Duende;
-import model.domain.GuardiaoDoHorizonte;
-import model.domain.datastructure.TreeMapAdaptado;
+import model.datastructure.TreeMapAdaptado;
+import model.entities.Duende;
+import model.entities.GuardiaoDoHorizonte;
+
 import java.util.ArrayList;
 import java.util.List;
 

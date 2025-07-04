@@ -16,8 +16,8 @@
 - [3.1 Setup](#31-setup)
 - [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
 - [4. Testes](#4-testes)
-- [4.1 Classes de teste](#41-classes-de-teste)
-- [4.2 Cobertura de Testes](#42-cobertura-de-testes)
+  - [4.1 Tipos de Teste Implementados](#41-tipos-de-teste-implementados)
+  - [4.2 Descrição das Classes de Teste](#42-descrição-das-classes-de-teste)
 
 # 1. Problema e Requisitos
 Implementem, em Java, uma simulação de criaturas saltitantes, conforme requisitos, a seguir:
@@ -47,39 +47,58 @@ Durante as execuções notou-se que é difícil haver colisões devido ao alto n
 
 ## 2.1 Tecnologias Usadas
 Para este projeto, foram utilizadas as seguintes tecnologias:
-- Java 21 + Maven
-- Swing
-- JUnit
-- Mockito
-- AssertJ
+- **Java 21**
+- **Maven** para dependências e gerenciamento do projeto
+- **Swing** para a interface gráfica
+- **JUnit**, **Mockito**, **AssertJ** e **Jqwik** para os testes automatizados
 
 ## 2.2 Estrutura do Projeto
 A arquitetura do projeto segue um padrão MVC (Model-View-Controller) para melhor organização sem adição desnecessária de complexidade. 
 
 Sendo assim, a estrutura de diretórios dos arquivos _source_ seguem:
 ```
-src
+src/
 ├── Main.java
-├── Controller
-│   └── SimulationController.java
-├── datastructure
-│   └── TreeMapAdaptado.java
-├── model
-│   └── Duende.java
-├── resources
-│   └── sprites
+├── Controller/
+│   ├── SimulationController.java
+|   ├── SimulationEngine.java
+|   └── SimulationSetup.java
+├── model/
+|   └── dao/
+|       ├── DatabaseManager.java
+|       └── UsuarioDAO.java
+|   └── datastructure/
+│       └── TreeMapAdaptado.java
+|   └── entities/
+|       └── interfaces/
+│           └── EntityOnHorizon.java
+│       ├── Cluster.java
+│       ├── Duende.java
+│       ├── GuardiaoDoHorizonte.java
+│       └── Usuario.java
+├── resources/
+│   └── sprites/
 │       └── duende.png
-└── view
+└── view/
     ├── MenuView.java
     └── SimulationView.java
 ```
 
 Para os arquivos de teste, a estrutura de diretórios é a seguinte:
 ```
-test
-├── DuendeTest.java
-├── SimulationControllerTest.java
-└── TreeMapAdaptadoTest.java
+test/
+├── controller/
+│   ├── SimulationControllerTest.java
+│   ├── SimulationEngineTest.java
+│   └── SimulationSetupTest.java
+├── model/
+│   ├── datastructure/
+│   │   └── TreeMapAdaptadoTest.java
+│   └── entities/
+│       ├── ClusterTest.java
+│       ├── DuendeTest.java
+│       ├── GuardiaoDoHorizonteTest.java
+│       └── UsuarioTest.java
 ```
 
 ## 2.3 Paralelismo
@@ -110,43 +129,41 @@ Para executar o projeto, siga os passos abaixo:
 4. A simulação será exibida em uma nova janela, mostrando as criaturas saltitantes e suas respectivas quantidades de moedas.
 5. Ao final da simulação será exibido um resumo do estado final das criaturas.
 
-
 # 4. Testes
-Os testes foram implementados utilizando o JUnit 5. Todos estão localizados no diretório `test/` e incluem:
-- Testes unitários
-- Testes de pré-condições e pós-condições
-- Testes de branchs
-- Testes de cobertura.
+Os testes do projeto foram desenvolvidos com **JUnit 5** e utilizam as bibliotecas **Mockito** para a criação de objetos mock e **AssertJ** para asserções fluentes e legíveis. Adicionalmente, testes baseados em propriedades foram implementados com **Jqwik**. Para facilitar a identificação, todos os métodos de teste utilizam a anotação `@DisplayName`.
 
-# 4.1 Classes de teste
-Os testes estão organizados em três classes principais:
+O foco principal é garantir a robustez e o comportamento esperado das regras de negócio, localizadas nos pacotes model e controller. Conforme as diretrizes do projeto, classes relacionadas diretamente à interface de usuário (pacote view) e à persistência de dados (pacote dao) não foram incluídas no escopo dos testes unitários.
 
-- `DuendeTest`:
-  - Criação e inicialização dos atributos.
-  - Movimentação dentro dos limites do horizonte.
-  - Operações de roubo e doação de moedas.
-  - Validação de pré-condições (como posições e valores inválidos).
-  - Testes de borda para posições e moedas.
+## 4.1 Tipos de Teste Implementados
+- Testes de Unidade: Verificam o funcionamento isolado dos métodos em cada classe, como as regras de movimentação e interação das entidades.
 
-- `TreeMapAdaptadoTest`:
-  - Inserção de duendes em posições distintas e tratamento de colisões de posição.
-  - Busca do duende mais próximo, considerando critérios de desempate por riqueza.
-  - Validação de pré-condições e pós-condições.
-  - Testes de exceção para entradas nulas ou inválidas.
-  - Testes de métodos auxiliares como verMaisRico.
+- Testes de Validação e Exceção: Garantem que o sistema lida corretamente com entradas inválidas (e.g., valores nulos ou negativos), lançando as exceções esperadas.
 
-- `SimulationControllerTest`:
-  - Inicialização da simulação com diferentes parâmetros, incluindo casos inválidos.
-  - Criação de duendes e inicialização do mapa.
-  - Execução dos métodos principais do controlador, incluindo movimentação, roubo, verificação de chegada e exibição dos resultados.
-  - Testes de integração com a interface gráfica (verificação da criação do painel e janela).
-  - Testes de métodos utilitários e de controle de fluxo.
-  - Cobertura de Testes
+- Testes de Domínio e Fronteira: Validam o comportamento do sistema nos limites dos valores de entrada permitidos, como o número mínimo/máximo de duendes em SimulationSetupTest.
 
-# 4.2 Cobertura de Testes
-A classe `Duende` atinge 90% de branch coverage, enquanto a `SimulationController` atinge 95% e a `TreeMapAdaptado`, 100%. 
+- Testes de Interação e Cenário: Usam **Mockito** para simular o comportamento de dependências e testar a lógica de interação entre diferentes objetos, como as colisões e roubos gerenciados pelo SimulationEngine.
 
-No escopo de `Duende`, com 90% de coverage, existem algumas condições específicas que dependem da aleatoriedade do movimento dos duendes. Estas podem não ser totalmente cobertas em todas as execuções dos testes. Apesar disso, todos os caminhos críticos, validações e exceções são testados explicitamente.
+- Testes Baseados em Propriedades: Em `UsuarioTest`, o **Jqwik** é utilizado para validar as propriedades do construtor da classe Usuario com uma vasta gama de dados gerados aleatoriamente.
 
-Já no escopo de `SimulationController`, com 95% de coverage, existem condições problemáticas que o código garante que sejam tratadas previamente, e portanto, são impossíveis de darem falsas
-(no caso, percorrer uma lista de Duendes que seja vazia/null, mas o código garante que isso não aconteça, e portanto, é impossível de testar). O outro caso acontece na função `verificarChegada()`, que por algum motivo, a coverage alega 30 "true hits", mesmo com a existência de um teste que garante um caso para false hits (o teste `testVerificarChegadaFalso`).
+- Testes Condicionais (MCDC): Em `SimulationControllerTest`, a lógica de pontuação e registro de simulações é testada sob diferentes condições (usuário logado/não logado, vitória/derrota).
+
+## 4.2 Descrição das Classes de Teste
+- `DuendeTest`, `ClusterTest` e `GuardiaoDoHorizonteTest`: Testam o ciclo de vida e as ações das entidades da simulação. Cobrem a inicialização de seus atributos, a lógica de movimentação (respeitando os limites do horizonte), as interações de steal (roubo) e beingStealed (ser roubado), e a adição de moedas.
+
+- `UsuarioTest`: Valida a construção e os métodos de acesso da entidade Usuario, empregando tanto um teste de domínio com valores fixos quanto um teste baseado em propriedades para assegurar a robustez do construtor.
+
+- `TreeMapAdaptadoTest`: Focado na estrutura de dados que organiza as entidades. Garante a correta adição de duendes, o tratamento de colisões de posição (deslocando a entidade), e a eficiência da busca pelo vizinho mais próximo, ignorando entidades que não podem ser alvo de roubo (como os Guardiões).
+
+- `SimulationSetupTest`: Responsável por validar a classe que configura o cenário inicial. Os testes são limitados a validações de entrada, como o número de duendes e o tamanho do horizonte, garantindo que a simulação não inicie com parâmetros inválidos.
+
+- `SimulationEngineTest`: Testa o núcleo lógico da simulação. Verifica as condições de término (vitória ou derrota) e as regras de interação a cada rodada, incluindo:
+
+  - Colisão entre duendes, resultando na criação de um Cluster.
+
+  - Colisão entre clusters, resultando na sua fusão.
+
+  - Colisão de um Guardião com outra entidade, resultando na absorção de moedas.
+
+  - Lógica de roubo ao encontrar um vizinho válido.
+
+- `SimulationControllerTest`: Verifica a camada de controle da simulação. Utiliza mocks para isolar a lógica de negócio e testar se o controlador interage corretamente com o DAO para incrementar a pontuação e o número de simulações de um usuário logado, de acordo com o resultado da partida.

@@ -1,9 +1,9 @@
 package controller;
 
 import Controller.SimulationSetup;
-import model.domain.Duende;
-import model.domain.GuardiaoDoHorizonte;
-import model.domain.datastructure.TreeMapAdaptado;
+import model.entities.Duende;
+import model.entities.GuardiaoDoHorizonte;
+import model.datastructure.TreeMapAdaptado;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

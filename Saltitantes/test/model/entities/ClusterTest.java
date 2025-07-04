@@ -1,6 +1,6 @@
-package model.domain;
+package model.entities;
 
-import model.domain.interfaces.EntityOnHorizon;
+import model.entities.interfaces.EntityOnHorizon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.*;

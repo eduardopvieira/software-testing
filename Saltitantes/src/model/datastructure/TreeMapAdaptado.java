@@ -5,85 +5,91 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 
-import model.domain.Duende;
+import model.entities.Duende;
+import model.entities.GuardiaoDoHorizonte;
+import model.entities.interfaces.EntityOnHorizon;
+import model.entities.Cluster;
 
 public class TreeMapAdaptado {
-    public TreeMap<Double, Duende> treeMapPrincipal = new TreeMap<>();
+    
+    public TreeMap<Double, EntityOnHorizon> treeMapPrincipal = new TreeMap<>();
 
-    public void addDuende(Duende duende) {
-
-        //!Testes de pré-condição (não tem pós-condição pq a função é void)
-        if (duende == null) {
-            throw new IllegalArgumentException("Duende não pode ser nulo.");
+    public void addDuendeInicial(Duende entidade) {
+        if (entidade == null) {
+            throw new IllegalArgumentException("Entidade não pode ser nula.");
         }
+        double chave = entidade.getPosition();
 
-        double chave = duende.getPosition();
-        
         while (treeMapPrincipal.containsKey(chave)) {
             chave += 0.1;
-            System.out.println("Conflito de duendes. Duende " + duende.getId() + " foi movido para " + chave);
         }
-        duende.setPosition(chave);
-        treeMapPrincipal.put(duende.getPosition(), duende);
+        entidade.setPosition(chave);
+        treeMapPrincipal.put(entidade.getPosition(), entidade);
     }
 
-    public Duende findNearestDuende(Duende atual) {
-
-        //!Teste de pré-condição
+    public EntityOnHorizon findNearestEntidade(EntityOnHorizon atual) {
         if (atual == null) {
-            throw new IllegalArgumentException("Duende não pode ser nulo.");
+            throw new IllegalArgumentException("Entidade não pode ser nula.");
         }
-
-        if (treeMapPrincipal.isEmpty() || treeMapPrincipal.size() == 1) {
-            throw new IllegalStateException("Não há duendes o suficiente na árvore.");
+        if (treeMapPrincipal.size() < 2) {
+            return null; // não há vizinhos para encontrar
         }
-
 
         double chaveAtual = atual.getPosition();
-        Map.Entry<Double, Duende> anterior = treeMapPrincipal.lowerEntry(chaveAtual);
-        Map.Entry<Double, Duende> posterior = treeMapPrincipal.higherEntry(chaveAtual);
+        Map.Entry<Double, EntityOnHorizon> anterior = treeMapPrincipal.lowerEntry(chaveAtual);
+        Map.Entry<Double, EntityOnHorizon> posterior = treeMapPrincipal.higherEntry(chaveAtual);
 
-        //!Não é necessário verificar se posterior ou anterior são nulos dentro do bloco do if,
-        //!pois a propria treemap impede que tenha apenas 1 duende na arvore.
-        if (anterior == null) return posterior.getValue();
-        if (posterior == null) return anterior.getValue();
+        while (anterior != null && anterior.getValue() instanceof GuardiaoDoHorizonte) {
+            anterior = treeMapPrincipal.lowerEntry(anterior.getKey());
+        }
+
+        while (posterior != null && posterior.getValue() instanceof GuardiaoDoHorizonte) {
+            posterior = treeMapPrincipal.higherEntry(posterior.getKey());
+        }
+        if (anterior == null && posterior == null) {
+            return null; // não há vizinhos válidos para roubar
+        }
+        if (anterior == null) {
+            return posterior.getValue();
+        }
+        if (posterior == null) {
+            return anterior.getValue();
+        }
 
         double distEsq = Math.abs(chaveAtual - anterior.getKey());
         double distDir = Math.abs(chaveAtual - posterior.getKey());
 
-        Duende retorno = null;
-
         if (distEsq < distDir) {
-            retorno = anterior.getValue();
-        } else if (distEsq > distDir) {
-            retorno = posterior.getValue();
+            return anterior.getValue();
+        } else if (distDir < distEsq) {
+            return posterior.getValue();
         } else {
-            retorno = verMaisRico(anterior.getValue(), posterior.getValue());
+            return verMaisRico(anterior.getValue(), posterior.getValue());
         }
-
-        //! Teste de pós-condição não se faz necessário, visto que a
-        //! função garante que o retorno não será nulo.
-        //! Quando coloquei a verificação, impedia o 100% em branch coverage.
-
-        return retorno;
-
     }
 
-    public Duende verMaisRico(Duende A, Duende B) {
-
-        //!Teste de pré-condição
+    public EntityOnHorizon verMaisRico(EntityOnHorizon A, EntityOnHorizon B) {
         if (A == null || B == null) {
-            throw new IllegalArgumentException("Duende não pode ser nulo.");
+            throw new IllegalArgumentException("Entidades para comparação não podem ser nulas.");
         }
 
         if (Objects.equals(A.getCoins(), B.getCoins())) {
             return new Random().nextBoolean() ? A : B;
         }
 
-        //! Teste de pós-condição não se faz necessário aqui. Se A ou B não forem nulos,
-        //! a condição vai necessariamente retornar um dos 2.
-
         return A.getCoins() > B.getCoins() ? A : B;
-
     }
+
+    public static String getNomeEntidade(EntityOnHorizon entidade) {
+        if (entidade instanceof Duende) {
+            return "Duende " + entidade.getId();
+        } else if (entidade instanceof Cluster) {
+            return "Cluster com " + ((Cluster) entidade).getQuantityDuendes() + " duendes";
+        } else if (entidade instanceof GuardiaoDoHorizonte) {
+            return "Guardião " + entidade.getId();
+        } else {
+            return "Entidade desconhecida";
+        }
+    }
+
 }

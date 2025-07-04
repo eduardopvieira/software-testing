@@ -1,4 +1,4 @@
-package model.domain;
+package model.entities;
 
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;

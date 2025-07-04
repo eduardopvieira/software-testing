@@ -1,7 +1,7 @@
 package view;
 
 import model.dao.UsuarioDAO;
-import model.domain.Usuario;
+import model.entities.Usuario;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;

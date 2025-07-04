@@ -1,4 +1,4 @@
-package model.domain;
+package model.entities;
 
 public class Usuario {
     private int id;

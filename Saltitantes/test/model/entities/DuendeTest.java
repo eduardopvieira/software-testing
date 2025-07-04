@@ -1,6 +1,6 @@
-package model.domain;
+package model.entities;
 
-import model.domain.interfaces.EntityOnHorizon;
+import model.entities.interfaces.EntityOnHorizon;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

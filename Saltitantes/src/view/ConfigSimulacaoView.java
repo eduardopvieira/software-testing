@@ -4,8 +4,8 @@ import Controller.SimulationController;
 import Controller.SimulationEngine;
 import Controller.SimulationSetup;
 import model.dao.UsuarioDAO;
-import model.domain.GuardiaoDoHorizonte;
-import model.domain.datastructure.TreeMapAdaptado;
+import model.datastructure.TreeMapAdaptado;
+import model.entities.GuardiaoDoHorizonte;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

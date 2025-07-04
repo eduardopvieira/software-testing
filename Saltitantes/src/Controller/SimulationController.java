@@ -1,11 +1,11 @@
 package Controller;
 
 import model.dao.UsuarioDAO;
-import model.domain.Cluster;
-import model.domain.Duende;
-import model.domain.GuardiaoDoHorizonte;
-import model.domain.datastructure.TreeMapAdaptado;
-import model.domain.interfaces.EntityOnHorizon;
+import model.datastructure.TreeMapAdaptado;
+import model.entities.Cluster;
+import model.entities.Duende;
+import model.entities.GuardiaoDoHorizonte;
+import model.entities.interfaces.EntityOnHorizon;
 import view.SimulationView;
 
 import javax.swing.*;

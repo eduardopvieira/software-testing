@@ -33,9 +33,11 @@ public class LoginView {
 
         JLabel loginLabel = new JLabel("Login:");
         loginField = new JTextField(20);
+        loginField.setName("loginField"); // Adicionar esta linha
 
         JLabel senhaLabel = new JLabel("Senha:");
         senhaField = new JPasswordField(20);
+        senhaField.setName("senhaField"); // Adicionar esta linha
 
         loginLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         loginField.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -43,6 +45,7 @@ public class LoginView {
         senhaField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton loginButton = new JButton("Fazer Login");
+        loginButton.setName("loginButton"); // Adicionar esta linha
         JButton criarContaButton = new JButton("Criar Conta");
         JButton excluirContaButton = new JButton("Excluir Conta");
 
@@ -216,5 +219,9 @@ public class LoginView {
         dialogo.pack();
         dialogo.setLocationRelativeTo(frame);
         dialogo.setVisible(true);
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }

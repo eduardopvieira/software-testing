@@ -43,15 +43,18 @@ public class ConfigSimulacaoView {
 
         JLabel duendesLabel = new JLabel("Digite o número de duendes (2-20):");
         duendesField = new JTextField(10);
+        duendesField.setName("duendesField"); // Adicionar esta linha
 
         JLabel horizonteLabel = new JLabel("Digite o tamanho máximo do horizonte:");
         horizonteField = new JTextField(10);
+        horizonteField.setName("horizonteField"); // Adicionar esta linha
 
         avisoHorizonteLabel = new JLabel("OBS: O tamanho recomendado do horizonte é...");
         avisoHorizonteLabel.setFont(new Font("Arial", Font.ITALIC, 11));
         avisoHorizonteLabel.setForeground(Color.GRAY);
 
         JButton startButton = new JButton("Iniciar Simulação");
+        startButton.setName("startButton"); // Adicionar esta linha
         JButton estatisticasButton = new JButton("Ver Estatísticas");
 
         duendesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);

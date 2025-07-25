@@ -44,12 +44,10 @@ public class LoginView {
 
         JButton loginButton = new JButton("Fazer Login");
         JButton criarContaButton = new JButton("Criar Conta");
-        JButton excluirContaButton = new JButton("Excluir Conta");
 
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         botoesPanel.add(loginButton);
         botoesPanel.add(criarContaButton);
-        botoesPanel.add(excluirContaButton);
         botoesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel.add(loginLabel);
@@ -62,7 +60,6 @@ public class LoginView {
 
         loginButton.addActionListener(e -> tentarLogin());
         criarContaButton.addActionListener(e -> abrirDialogoCriarConta());
-        excluirContaButton.addActionListener(e -> abrirDialogoExcluirConta());
 
         frame.add(panel, BorderLayout.CENTER);
     }
@@ -81,39 +78,6 @@ public class LoginView {
             new ConfigSimulacaoView(login).exibir();
         } else {
             JOptionPane.showMessageDialog(frame, "Login ou senha inválidos.", "Falha no Login", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void abrirDialogoExcluirConta() {
-        String loginParaExcluir = JOptionPane.showInputDialog(
-                frame,
-                "Digite o login da conta a ser excluída:",
-                "Excluir Conta",
-                JOptionPane.WARNING_MESSAGE
-        );
-
-        if (loginParaExcluir == null || loginParaExcluir.trim().isEmpty()) {
-            return;
-        }
-
-        int confirmacao = JOptionPane.showConfirmDialog(
-                frame,
-                "Você tem certeza que deseja excluir o usuário '" + loginParaExcluir.trim() + "'?\nEsta ação não pode ser desfeita.",
-                "Confirmação de Exclusão",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        if (confirmacao != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        boolean sucesso = usuarioDAO.excluirUsuario(loginParaExcluir.trim());
-
-        if (sucesso) {
-            JOptionPane.showMessageDialog(frame, "Usuário '" + loginParaExcluir.trim() + "' foi excluído com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(frame, "Nenhum usuário com o nome '" + loginParaExcluir.trim() + "' foi encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 

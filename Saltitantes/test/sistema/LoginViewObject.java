@@ -1,7 +1,8 @@
-package view;
+package sistema;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.finder.WindowFinder;
+import org.assertj.swing.fixture.DialogFixture;
 import org.assertj.swing.fixture.FrameFixture;
 import javax.swing.*;
 
@@ -42,5 +43,44 @@ public class LoginViewObject {
 
     public void verificarMensagemDeErro(String mensagem) {
         window.optionPane().requireErrorMessage().requireMessage(mensagem);
+    }
+
+    public void verificarMensagemDeSucesso(String mensagem) {
+        window.optionPane().requireMessage(mensagem);
+    }
+
+    public CriarContaDialogObject clicarCriarConta() {
+        window.button("criarContaButton").click();
+        // Encontra o diálogo de criar conta
+        DialogFixture dialog = WindowFinder.findDialog(new GenericTypeMatcher<JDialog>(JDialog.class) {
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return "Criar Nova Conta".equals(dialog.getTitle()) && dialog.isShowing();
+            }
+        }).using(window.robot());
+        
+        return new CriarContaDialogObject(dialog, window);
+    }
+
+    public LoginViewObject clicarExcluirConta() {
+        window.button("excluirContaButton").click();
+        return this;
+    }
+
+    // Métodos para interagir com os OptionPanes de exclusão
+    public LoginViewObject preencherLoginParaExcluir(String login) {
+        window.optionPane().textBox().enterText(login);
+        window.optionPane().okButton().click();
+        return this;
+    }
+
+    public LoginViewObject confirmarExclusao() {
+        window.optionPane().yesButton().click();
+        return this;
+    }
+
+    public LoginViewObject negarExclusao() {
+        window.optionPane().noButton().click();
+        return this;
     }
 }

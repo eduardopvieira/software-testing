@@ -1,7 +1,8 @@
-package view;
+package sistema;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.finder.WindowFinder;
+import org.assertj.swing.fixture.DialogFixture;
 import org.assertj.swing.fixture.FrameFixture;
 import javax.swing.*;
 
@@ -31,5 +32,20 @@ public class ConfigSimulacaoViewObject {
             }
         }).using(window.robot());
         return new SimulationViewObject(simFrame);
+    }
+
+    public StatisticsViewObject clicarVerEstatisticas() {
+        window.button("estatisticasButton").click();
+        DialogFixture dialog = WindowFinder.findDialog(new GenericTypeMatcher<JDialog>(JDialog.class) {
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return "Estatísticas da Simulação".equals(dialog.getTitle()) && dialog.isShowing();
+            }
+        }).using(window.robot());
+        return new StatisticsViewObject(dialog);
+    }
+
+    public void estaVisivel() {
+        window.requireVisible();
     }
 }

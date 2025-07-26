@@ -46,8 +46,12 @@ public class LoginView {
 
         JButton loginButton = new JButton("Fazer Login");
         loginButton.setName("loginButton"); // Adicionar esta linha
+
         JButton criarContaButton = new JButton("Criar Conta");
+        criarContaButton.setName("criarContaButton"); // Adicionar esta linha
+
         JButton excluirContaButton = new JButton("Excluir Conta");
+        excluirContaButton.setName("excluirContaButton"); // Adicionar esta linha
 
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         botoesPanel.add(loginButton);
@@ -133,13 +137,17 @@ public class LoginView {
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(new JLabel("Login:"), gbc);
         gbc.gridx = 1; gbc.gridy = 0;
+
         JTextField novoLoginField = new JTextField(15);
+        novoLoginField.setName("novoLoginField"); // Adicionado
         panel.add(novoLoginField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
         panel.add(new JLabel("Senha:"), gbc);
         gbc.gridx = 1; gbc.gridy = 1;
+        
         JPasswordField novaSenhaField = new JPasswordField(15);
+        novaSenhaField.setName("novaSenhaField"); // Adicionado
         panel.add(novaSenhaField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
@@ -162,9 +170,11 @@ public class LoginView {
         }
 
         JRadioButton rbAvatar1 = new JRadioButton("Duende", avatar1Icon);
+        rbAvatar1.setName("avatarDuendeRadio");
         rbAvatar1.setActionCommand(avatar1Path);
 
         JRadioButton rbAvatar2 = new JRadioButton("Guardião", avatar2Icon);
+        rbAvatar2.setName("avatarGuardiaoRadio");
         rbAvatar2.setActionCommand(avatar2Path);
 
         ButtonGroup avatarGroup = new ButtonGroup();
@@ -181,7 +191,9 @@ public class LoginView {
         panel.add(new JSeparator(), gbc);
 
         JButton confirmarButton = new JButton("Confirmar");
+        confirmarButton.setName("confirmarButton"); // Adicionar esta linha
         JButton cancelarButton = new JButton("Cancelar");
+        cancelarButton.setName("cancelarButton"); // Adicionar esta linha
 
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         botoesPanel.add(cancelarButton);

@@ -1,4 +1,4 @@
-package view;
+package sistema;
 
 import org.assertj.swing.fixture.FrameFixture;
 
@@ -11,5 +11,10 @@ public class SimulationViewObject {
 
     public void estaVisivel() {
         window.requireVisible();
+    }
+
+    public SimulationViewObject clicarOkAoFinalizar() {
+        window.button("okButton").click();
+        return this;
     }
 }

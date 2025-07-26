@@ -56,6 +56,7 @@ public class ConfigSimulacaoView {
         JButton startButton = new JButton("Iniciar Simulação");
         startButton.setName("startButton"); // Adicionar esta linha
         JButton estatisticasButton = new JButton("Ver Estatísticas");
+        estatisticasButton.setName("estatisticasButton"); // Adicionar esta linha
 
         duendesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         duendesField.setAlignmentX(Component.LEFT_ALIGNMENT);

@@ -48,4 +48,27 @@ public class ConfigSimulacaoViewObject {
     public void estaVisivel() {
         window.requireVisible();
     }
+
+    public ConfigSimulacaoViewObject clicarExcluirConta() {
+        window.button("excluirContaButton").click();
+        return this;
+    }
+
+    public ConfigSimulacaoViewObject confirmarExclusao() {
+        window.optionPane().yesButton().click();
+        return this;
+    }
+
+    public ConfigSimulacaoViewObject negarExclusao() {
+        window.optionPane().noButton().click();
+        return this;
+    }
+
+    public void verificarMensagemDeErro(String mensagem) {
+        window.optionPane().requireErrorMessage().requireMessage(mensagem);
+    }
+
+    public void verificarMensagemDeSucesso(String mensagem) {
+        window.optionPane().requireMessage(mensagem);
+    }
 }

@@ -61,26 +61,4 @@ public class LoginViewObject {
         
         return new CriarContaDialogObject(dialog, window);
     }
-
-    public LoginViewObject clicarExcluirConta() {
-        window.button("excluirContaButton").click();
-        return this;
-    }
-
-    // Métodos para interagir com os OptionPanes de exclusão
-    public LoginViewObject preencherLoginParaExcluir(String login) {
-        window.optionPane().textBox().enterText(login);
-        window.optionPane().okButton().click();
-        return this;
-    }
-
-    public LoginViewObject confirmarExclusao() {
-        window.optionPane().yesButton().click();
-        return this;
-    }
-
-    public LoginViewObject negarExclusao() {
-        window.optionPane().noButton().click();
-        return this;
-    }
 }

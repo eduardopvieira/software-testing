@@ -105,30 +105,22 @@ public class FluxoSistemaCompletoTest extends AssertJSwingJUnitTestCase {
     // --- TESTES DE REMOÇÃO DE CONTA ---
 
     @Test
-    public void testG_deveFalharAoRemoverContaInexistente() {
+    public void testG_deveCancelarARemocaoDeConta() {
         LoginViewObject loginPage = new LoginViewObject(window);
-        loginPage.clicarExcluirConta()
-                 .preencherLoginParaExcluir("usuario_fantasma")
-                 .confirmarExclusao();
-        loginPage.verificarMensagemDeErro("Nenhum usuário com o nome 'usuario_fantasma' foi encontrado.");
-    }
+        ConfigSimulacaoViewObject configPage = loginPage.preencherLogin("teste").preencherSenha("123").clicarLoginComSucesso();
 
-    @Test
-    public void testH_deveCancelarARemocaoDeConta() {
-        LoginViewObject loginPage = new LoginViewObject(window);
-        loginPage.clicarExcluirConta()
-                 .preencherLoginParaExcluir("teste")
+        configPage.clicarExcluirConta()
                  .negarExclusao();
-        // A asserção é que nada acontece e a janela principal continua visível.
-        window.requireVisible();
+        configPage.estaVisivel();
     }
 
     @Test
-    public void testI_deveRemoverContaComSucesso() {
+    public void testH_deveRemoverContaComSucesso() {
         LoginViewObject loginPage = new LoginViewObject(window);
-        loginPage.clicarExcluirConta()
-                 .preencherLoginParaExcluir("teste")
+        ConfigSimulacaoViewObject configPage = loginPage.preencherLogin("teste").preencherSenha("123").clicarLoginComSucesso();
+
+        configPage.clicarExcluirConta()
                  .confirmarExclusao();
-        loginPage.verificarMensagemDeSucesso("Usuário 'teste' foi excluído com sucesso."); // Reutilizando para mensagens de info
+        configPage.verificarMensagemDeSucesso("Sua conta foi excluída com sucesso.");
     }
 }

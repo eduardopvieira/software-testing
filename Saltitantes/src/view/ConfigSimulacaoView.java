@@ -59,7 +59,7 @@ public class ConfigSimulacaoView {
         estatisticasButton.setName("estatisticasButton");
 
         JButton deleteButton = new JButton("Excluir Minha Conta");
-        deleteButton.setName("deleteButton");
+        deleteButton.setName("excluirContaButton");
         deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         deleteButton.setForeground(Color.RED);
 

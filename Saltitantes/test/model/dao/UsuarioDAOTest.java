@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.domain.Usuario;
+import model.entities.Usuario;
 import org.junit.jupiter.api.*;
 
 import java.sql.Connection;

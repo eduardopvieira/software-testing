@@ -53,6 +53,9 @@ public class ConfigSimulacaoView {
 
         JButton startButton = new JButton("Iniciar Simulação");
         JButton estatisticasButton = new JButton("Ver Estatísticas");
+        JButton deleteButton = new JButton("Excluir Minha Conta");
+        deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deleteButton.setForeground(Color.RED);
 
         duendesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         duendesField.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -73,6 +76,8 @@ public class ConfigSimulacaoView {
         panel.add(startButton);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(estatisticasButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(deleteButton);
 
         frame.add(panel, BorderLayout.CENTER);
 
@@ -93,12 +98,42 @@ public class ConfigSimulacaoView {
 
         startButton.addActionListener(e -> iniciarSimulacao());
         estatisticasButton.addActionListener(e -> new StatisticsView(frame).exibir());
+        deleteButton.addActionListener(e -> excluirContaLogada());
     }
 
-    /**
-     * <<< NOVO: Método que atualiza o texto do aviso >>>
-     * É chamado sempre que o texto no campo de duendes muda.
-     */
+    private void excluirContaLogada() {
+        int confirmacao = JOptionPane.showConfirmDialog(
+                frame,
+                "Você tem certeza que deseja excluir sua conta '" + this.loginUsuario + "'?\nEsta ação é irreversível.",
+                "Confirmação de Exclusão",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            UsuarioDAO dao = new UsuarioDAO();
+            boolean sucesso = dao.excluirUsuario(this.loginUsuario);
+
+            if (sucesso) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Sua conta foi excluída com sucesso.",
+                        "Operação Concluída",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                frame.dispose();
+                new LoginView().exibir();
+            } else {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Ocorreu um erro e não foi possível excluir sua conta.",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
     private void atualizarAvisoHorizonte() {
         try {
             int numDuendes = Integer.parseInt(duendesField.getText());

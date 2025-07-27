@@ -6,9 +6,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseManager {
-    private static final String DB_URL = "jdbc:h2:./simulationDB";
+    private static String DB_URL = "jdbc:h2:./simulationDB";
     private static final String DB_USER = "sa";
     private static final String DB_PASSWORD = "";
+
+    public static void setDbUrl(String newUrl) {
+        DB_URL = newUrl;
+    }
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);

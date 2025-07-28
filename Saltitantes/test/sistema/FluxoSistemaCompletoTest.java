@@ -2,6 +2,7 @@ package sistema;
 
 import model.dao.DatabaseManager;
 import model.dao.UsuarioDAO;
+
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;

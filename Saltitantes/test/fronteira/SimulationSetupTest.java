@@ -1,4 +1,4 @@
-package controller;
+package fronteira;
 
 import Controller.SimulationSetup;
 import model.entities.Duende;

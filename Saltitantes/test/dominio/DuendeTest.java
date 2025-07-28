@@ -1,5 +1,6 @@
-package model.entities;
+package dominio;
 
+import model.entities.Duende;
 import model.entities.interfaces.EntityOnHorizon;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

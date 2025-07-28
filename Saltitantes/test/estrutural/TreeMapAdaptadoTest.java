@@ -1,5 +1,6 @@
-package model.datastructure;
+package estrutural;
 
+import model.datastructure.TreeMapAdaptado;
 import model.entities.Cluster;
 import model.entities.Duende;
 import model.entities.GuardiaoDoHorizonte;

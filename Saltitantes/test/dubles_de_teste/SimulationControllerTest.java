@@ -1,4 +1,4 @@
-package controller;
+package dubles_de_teste;
 
 import Controller.SimulationController;
 import Controller.SimulationEngine;

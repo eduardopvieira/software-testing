@@ -53,8 +53,8 @@ public class SimulationView extends JPanel {
 
     private void loadSprites(List<EntityOnHorizon> entidadesIniciais) {
         try {
-            String resourcePath = "/model/domain/resources/sprites/duende.png";
-            String guardiaoPath = "/model/domain/resources/sprites/guardiao-com-pa.png";
+            String resourcePath = "/model/entities/resources/sprites/duende.png";
+            String guardiaoPath = "/model/entities/resources/sprites/guardiao-com-pa.png";
             BufferedImage originalSprite = ImageIO.read(getClass().getResource(resourcePath));
 
             this.guardiaoSprite = ImageIO.read(getClass().getResource(guardiaoPath));

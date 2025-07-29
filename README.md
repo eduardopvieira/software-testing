@@ -12,12 +12,11 @@
   - [2.1 Tecnologias Usadas](#21-tecnologias-usadas)
   - [2.2 Estrutura do Projeto](#22-estrutura-do-projeto)
   - [2.3 Paralelismo](#23-paralelismo)
+  - [2.4 Diagramas de Projeto](#24-diagramas-de-projeto)
 - [3. Execução do Projeto](#3-execução-do-projeto)
-- [3.1 Setup](#31-setup)
-- [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
-- [4. Testes](#4-testes)
-  - [4.1 Tipos de Teste Implementados](#41-tipos-de-teste-implementados)
-  - [4.2 Descrição das Classes de Teste](#42-descrição-das-classes-de-teste)
+  - [3.1 Setup](#31-setup)
+  - [4.2 Tipos de Teste Implementados](#42-tipos-de-teste-implementados)
+  - [4.3 Descrição das Classes de Teste](#43-descrição-das-classes-de-teste)
 
 # 1. Problema e Requisitos
 Implementem, em Java, uma simulação de criaturas saltitantes, conforme requisitos, a seguir:
@@ -108,9 +107,13 @@ A classe `SimulationController` é responsável por gerenciar essa execução pa
 
 Para garantir que, ao atingir um critério de parada, a simulação interrompa imediatamente, sobrescrevemos a função `repaint()` da classe `JPanel` e a chamamos dentro do loop de execução, encapsulada pela thread de simulação.
 
+## 2.4 Diagramas de Projeto
+diagrama de arquitetura
+diagrama de classe
+
 # 3. Execução do Projeto
 
-# 3.1 Setup
+## 3.1 Setup
 Para executar o projeto, siga os passos abaixo:
 1. Certifique-se de ter o Java 21 instalado em sua máquina.
 2. Clone o repositório:
@@ -121,7 +124,7 @@ Para executar o projeto, siga os passos abaixo:
 3. Navegue até o diretório do projeto
 4. Compile o projeto
 
-# 3.2 Execução e configuração da simulação
+## 3.2 Execução e configuração da simulação
 1. Execute a `main()` presente em `Main.java`:
 2. O menu inicial será exibido, permitindo que você escolha o número de criaturas, o máximo de ouro, e o limite do horizonte.
 >Obs.: O máximo de moedas e o limite do horizonte serão critérios de parada da simulação.
@@ -130,40 +133,72 @@ Para executar o projeto, siga os passos abaixo:
 5. Ao final da simulação será exibido um resumo do estado final das criaturas.
 
 # 4. Testes
-Os testes do projeto foram desenvolvidos com **JUnit 5** e utilizam as bibliotecas **Mockito** para a criação de objetos mock e **AssertJ** para asserções fluentes e legíveis. Adicionalmente, testes baseados em propriedades foram implementados com **Jqwik**. Para facilitar a identificação, todos os métodos de teste utilizam a anotação `@DisplayName`.
 
-O foco principal é garantir a robustez e o comportamento esperado das regras de negócio, localizadas nos pacotes model e controller. Conforme as diretrizes do projeto, classes relacionadas diretamente à interface de usuário (pacote view) e à persistência de dados (pacote dao) não foram incluídas no escopo dos testes unitários.
+Os testes do projeto foram desenvolvidos com **JUnit 5** e utilizam as bibliotecas **Mockito** para a criação de dublês de teste, **AssertJ** para asserções fluentes, e **Jqwik** para testes baseados em propriedades. Para facilitar a identificação, todos os métodos de teste utilizam a anotação `@DisplayName`.
 
-## 4.1 Tipos de Teste Implementados
-- Testes de Unidade: Verificam o funcionamento isolado dos métodos em cada classe, como as regras de movimentação e interação das entidades.
+Os testes foram organizados em diretórios que refletem suas categorias e objetivos, permitindo associar claramente cada classe de teste à estratégia de teste empregada.
 
-- Testes de Validação e Exceção: Garantem que o sistema lida corretamente com entradas inválidas (e.g., valores nulos ou negativos), lançando as exceções esperadas.
+## 4.1 Estrutura de Diretórios de Teste
+A estrutura de diretórios foi reorganizada para refletir as diferentes categorias de testes aplicadas:
 
-- Testes de Domínio e Fronteira: Validam o comportamento do sistema nos limites dos valores de entrada permitidos, como o número mínimo/máximo de duendes em SimulationSetupTest.
+```
+test/
+├── baseados_em_propriedade/
+│   └── UsuarioTest.java
+├── dominio/
+│   ├── ClusterTest.java
+│   └── DuendeTest.java
+├── dubles_de_teste/
+│   ├── GuardiaoDoHorizonteTest.java
+│   ├── SimulationControllerTest.java
+│   └── SimulationEngineTest.java
+├── estrutural/
+│   └── TreeMapAdaptadoTest.java
+├── fronteira/
+│   └── SimulationSetupTest.java
+├── integracao/
+│   └── UsuarioDAOTest.java
+├── sistema/
+│   ├── FluxoSistemaCompletoTest.java
+│   ├── ConfigSimulacaoViewObject.java
+│   ├── CriarContaDialogObject.java
+│   ├── LoginViewObject.java
+│   ├── SimulationViewObject.java
+│   └── StatisticsViewObject.java
+```
 
-- Testes de Interação e Cenário: Usam **Mockito** para simular o comportamento de dependências e testar a lógica de interação entre diferentes objetos, como as colisões e roubos gerenciados pelo SimulationEngine.
+## 4.2 Tipos de Teste Implementados
 
-- Testes Baseados em Propriedades: Em `UsuarioTest`, o **Jqwik** é utilizado para validar as propriedades do construtor da classe Usuario com uma vasta gama de dados gerados aleatoriamente.
+- **Testes de Domínio:** Verificam as regras de negócio e a lógica central das entidades (`DuendeTest`, `ClusterTest`).
 
-- Testes Condicionais (MCDC): Em `SimulationControllerTest`, a lógica de pontuação e registro de simulações é testada sob diferentes condições (usuário logado/não logado, vitória/derrota).
+- **Testes de Fronteira:** Validam o comportamento do sistema nos limites dos valores de entrada permitidos, como o número mínimo e máximo de duendes (`SimulationSetupTest`).
 
-## 4.2 Descrição das Classes de Teste
-- `DuendeTest`, `ClusterTest` e `GuardiaoDoHorizonteTest`: Testam o ciclo de vida e as ações das entidades da simulação. Cobrem a inicialização de seus atributos, a lógica de movimentação (respeitando os limites do horizonte), as interações de steal (roubo) e beingStealed (ser roubado), e a adição de moedas.
+- **Testes Estruturais:** Focam no funcionamento interno de uma estrutura ou algoritmo, como o tratamento de colisões de posição no `TreeMapAdaptadoTest`.
 
-- `UsuarioTest`: Valida a construção e os métodos de acesso da entidade Usuario, empregando tanto um teste de domínio com valores fixos quanto um teste baseado em propriedades para assegurar a robustez do construtor.
+- **Testes Baseados em Propriedade:** Utilizam a biblioteca **Jqwik** para validar propriedades do sistema com uma vasta gama de dados gerados aleatoriamente, garantindo robustez (`UsuarioTest`).
 
-- `TreeMapAdaptadoTest`: Focado na estrutura de dados que organiza as entidades. Garante a correta adição de duendes, o tratamento de colisões de posição (deslocando a entidade), e a eficiência da busca pelo vizinho mais próximo, ignorando entidades que não podem ser alvo de roubo (como os Guardiões).
+- **Testes com Dublês:** Empregam **Mockito** para criar dublês (Mocks) que simulam o comportamento de dependências, permitindo testar a lógica de um componente de forma isolada (`SimulationControllerTest`, `SimulationEngineTest`, `GuardiaoDoHorizonteTest`).
 
-- `SimulationSetupTest`: Responsável por validar a classe que configura o cenário inicial. Os testes são limitados a validações de entrada, como o número de duendes e o tamanho do horizonte, garantindo que a simulação não inicie com parâmetros inválidos.
+- **Testes de Integração:** Verificam a interação entre diferentes camadas da aplicação, especialmente com componentes externos, como a comunicação com o banco de dados em `UsuarioDAOTest`.
 
-- `SimulationEngineTest`: Testa o núcleo lógico da simulação. Verifica as condições de término (vitória ou derrota) e as regras de interação a cada rodada, incluindo:
+- **Testes de Sistema:** Simulam a jornada completa do usuário na aplicação, desde o login até a execução de uma simulação. Utilizam o padrão **Page Object** para interagir com a interface gráfica de forma robusta e legível (`FluxoSistemaCompletoTest`).
 
-  - Colisão entre duendes, resultando na criação de um Cluster.
+## 4.3 Descrição das Classes de Teste
 
-  - Colisão entre clusters, resultando na sua fusão.
+- **`DuendeTest`, `ClusterTest` (Domínio):** Testam o ciclo de vida e as ações das entidades, incluindo a inicialização de atributos, a lógica de movimentação, as interações de roubo e as regras de adição de moedas.
 
-  - Colisão de um Guardião com outra entidade, resultando na absorção de moedas.
+- **`GuardiaoDoHorizonteTest` (Dublês de Teste):** Valida a entidade `Guardiao`, utilizando um mock de `Random` para testar a lógica de movimento de forma determinística.
 
-  - Lógica de roubo ao encontrar um vizinho válido.
+- **`UsuarioTest` (Baseados em Propriedade):** Valida a entidade `Usuario`, usando testes de propriedade com **Jqwik** para assegurar a robustez do construtor contra uma ampla variedade de dados.
 
-- `SimulationControllerTest`: Verifica a camada de controle da simulação. Utiliza mocks para isolar a lógica de negócio e testar se o controlador interage corretamente com o DAO para incrementar a pontuação e o número de simulações de um usuário logado, de acordo com o resultado da partida.
+- **`TreeMapAdaptadoTest` (Estrutural):** Focado na estrutura de dados que organiza as entidades. Garante o tratamento de colisões de posição e a eficiência na busca pelo vizinho mais próximo.
+
+- **`SimulationSetupTest` (Fronteira):** Valida a classe que configura o cenário inicial, garantindo que a simulação não inicie com parâmetros inválidos (e.g., número de duendes ou tamanho do horizonte fora dos limites).
+
+- **`SimulationEngineTest` (Dublês de Teste):** Testa o núcleo lógico da simulação. Utiliza mocks para isolar e verificar as condições de término (vitória/derrota) e as regras de interação a cada rodada (colisões, fusões e roubos).
+
+- **`SimulationControllerTest` (Dublês de Teste):** Verifica a camada de controle, testando se o controlador interage corretamente com o DAO para gerenciar a pontuação e as simulações do usuário, de acordo com o resultado da partida.
+
+- **`UsuarioDAOTest` (Integração):** Valida a camada de acesso a dados (DAO), testando a comunicação com um banco de dados em memória (H2) para garantir o funcionamento das operações de CRUD de usuários.
+
+- **`FluxoSistemaCompletoTest` (Sistema):** Orquestra um teste de ponta a ponta que simula a interação real de um usuário. Cobre fluxos como login (com sucesso e falha), criação de conta, visualização de estatísticas e exclusão de conta, garantindo que a aplicação se comporta como esperado do início ao fim.

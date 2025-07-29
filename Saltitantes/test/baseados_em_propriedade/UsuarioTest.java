@@ -1,4 +1,4 @@
-package model.entities;
+package baseados_em_propriedade;
 
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
@@ -6,6 +6,8 @@ import net.jqwik.api.constraints.IntRange;
 import net.jqwik.api.constraints.StringLength;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import model.entities.Usuario;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

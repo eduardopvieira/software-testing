@@ -1,5 +1,6 @@
-package model.entities;
+package dubles_de_teste;
 
+import model.entities.GuardiaoDoHorizonte;
 import model.entities.interfaces.EntityOnHorizon;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

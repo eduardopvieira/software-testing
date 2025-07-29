@@ -1,5 +1,7 @@
-package model.dao;
+package integracao;
 
+import model.dao.DatabaseManager;
+import model.dao.UsuarioDAO;
 import model.entities.Usuario;
 import org.junit.jupiter.api.*;
 

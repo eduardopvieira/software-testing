@@ -1,4 +1,4 @@
-package controller;
+package dubles_de_teste;
 
 import Controller.SimulationEngine;
 import model.entities.Cluster;

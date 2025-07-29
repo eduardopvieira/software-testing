@@ -15,6 +15,9 @@
   - [2.4 Diagramas de Projeto](#24-diagramas-de-projeto)
 - [3. Execução do Projeto](#3-execução-do-projeto)
   - [3.1 Setup](#31-setup)
+  - [3.2 Execução e configuração da simulação](#32-execução-e-configuração-da-simulação)
+- [4. Testes](#4-testes)
+  - [4.1 Estrutura de Diretórios de Teste](#41-estrutura-de-diretórios-de-teste)
   - [4.2 Tipos de Teste Implementados](#42-tipos-de-teste-implementados)
   - [4.3 Descrição das Classes de Teste](#43-descrição-das-classes-de-teste)
 
@@ -108,8 +111,11 @@ A classe `SimulationController` é responsável por gerenciar essa execução pa
 Para garantir que, ao atingir um critério de parada, a simulação interrompa imediatamente, sobrescrevemos a função `repaint()` da classe `JPanel` e a chamamos dentro do loop de execução, encapsulada pela thread de simulação.
 
 ## 2.4 Diagramas de Projeto
-diagrama de arquitetura
-diagrama de classe
+Diagrama de Arquitetura:
+<img width="4432" height="2788" alt="diagrama-arquitetura" src="https://github.com/user-attachments/assets/5f37edcd-d30d-432e-a242-e9998b2c0d47" />
+
+Diagrama UML de Classes:
+<img width="2820" height="2260" alt="diagrama-UML" src="https://github.com/user-attachments/assets/888b9c04-772f-446c-b443-11eb3cada3ef" />
 
 # 3. Execução do Projeto
 

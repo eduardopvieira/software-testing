@@ -9,8 +9,6 @@ import model.entities.interfaces.EntityOnHorizon;
 import view.SimulationView;
 
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 

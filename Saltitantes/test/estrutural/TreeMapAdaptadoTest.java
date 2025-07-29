@@ -1,9 +1,9 @@
-package model.datastructure;
+package estrutural;
 
+import model.datastructure.TreeMapAdaptado;
 import model.entities.Cluster;
 import model.entities.Duende;
 import model.entities.GuardiaoDoHorizonte;
-import model.datastructure.TreeMapAdaptado;
 import model.entities.interfaces.EntityOnHorizon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

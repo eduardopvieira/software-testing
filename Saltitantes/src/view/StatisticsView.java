@@ -105,6 +105,7 @@ public class StatisticsView {
         // Cria um painel para o botão de voltar, alinhado à direita
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton botaoVoltar = new JButton("Voltar");
+        botaoVoltar.setName("voltarButton");
 
         botaoVoltar.addActionListener(e -> dialogo.dispose());
 
